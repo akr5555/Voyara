@@ -37,8 +37,9 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' })); // Limit payload size
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Swagger UI setup
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+// Swagger UI setup - MUST be before other routes
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Voyara API Documentation'
 }));
@@ -246,11 +247,8 @@ app.use(express.static(path.join(__dirname, '../dist')));
 
 // The "catchall" handler: for any request that doesn't
 // match API or Swagger routes, send back React's index.html file.
-app.get('*', (req, res, next) => {
-  // Skip if it's an API or Swagger route
-  if (req.path.startsWith('/api') || req.path.startsWith('/api-docs')) {
-    return next();
-  }
+// This must be the LAST route
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
