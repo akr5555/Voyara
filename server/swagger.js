@@ -19,7 +19,7 @@ const options = {
       },
       {
         url: 'https://voyara.onrender.com',
-        description: 'Production server (Update with your actual Render URL)'
+        description: 'Production server'
       }
     ],
     components: {
