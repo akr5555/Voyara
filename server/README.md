@@ -45,6 +45,41 @@ After deployment to Render:
 - **Swagger UI**: https://your-app-name.onrender.com/api-docs
 - **API Base URL**: https://your-app-name.onrender.com/api
 
+## Security Features
+
+### ✅ Built-in Security (Same-Domain Deployment)
+
+Serving both frontend and API from the same URL provides several security benefits:
+
+1. **No CORS vulnerabilities** - Same-origin policy protection
+2. **Unified SSL/TLS** - Single certificate for all traffic
+3. **Cookie security** - HttpOnly and Secure cookies work seamlessly
+4. **Hidden API endpoints** - API calls appear as relative paths
+5. **Simplified authentication** - No cross-origin token issues
+
+### 🔒 Security Middleware Implemented
+
+- **Helmet.js** - Sets secure HTTP headers
+  - X-Content-Type-Options
+  - X-Frame-Options
+  - X-XSS-Protection
+  - Content-Security-Policy
+  
+- **Rate Limiting** - Prevents API abuse
+  - 100 requests per 15 minutes per IP
+  - Applied to all `/api/*` endpoints
+  
+- **Request Size Limits** - Prevents payload attacks
+  - JSON/URL-encoded payloads limited to 10MB
+
+### 🛡️ Best Practices
+
+1. **Environment Variables**: Never commit sensitive data
+2. **HTTPS Only**: Render provides free SSL certificates
+3. **Input Validation**: Always validate user inputs
+4. **Error Handling**: Don't expose sensitive error details
+5. **Regular Updates**: Keep dependencies updated
+
 ## Available API Endpoints
 
 ### System
