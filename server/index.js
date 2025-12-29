@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Security Middleware - Disable for Swagger route
+// Security Middleware - Configure CSP to allow Supabase and Google Fonts
 app.use((req, res, next) => {
   if (req.path.startsWith('/api-docs')) {
     return next();
@@ -22,9 +22,31 @@ app.use((req, res, next) => {
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: [
+          "'self'",
+          "https://*.supabase.co",
+          "https://yrlzcfuubkqdbkwlhjih.supabase.co"
+        ],
+        styleSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "https://fonts.googleapis.com"
+        ],
+        fontSrc: [
+          "'self'",
+          "https://fonts.gstatic.com",
+          "data:"
+        ],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'"
+        ],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "https:",
+          "blob:"
+        ],
       },
     },
   })(req, res, next);
