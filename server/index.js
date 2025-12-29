@@ -254,16 +254,12 @@ app.get('/api/trips/:id', (req, res) => {
 // Important: Static files and catch-all MUST be after all API routes
 // Serve static files from the React app (for production)
 const distPath = path.join(__dirname, '../dist');
-app.use(express.static(distPath, { index: false }));
+app.use(express.static(distPath));
 
 // The "catchall" handler: for any request that doesn't
 // match API or Swagger routes, send back React's index.html file.
-// This must be the LAST route
-app.get('*', (req, res) => {
-  // Don't handle API or api-docs routes
-  if (req.path.startsWith('/api') || req.path.startsWith('/api-docs')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
+// This must be the LAST route - using regex instead of * for Express 5+
+app.get(/^(?!\/api)(?!\/api-docs).*/, (req, res) => {
   res.sendFile(path.join(distPath, 'index.html'));
 });
 
