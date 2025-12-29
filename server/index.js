@@ -85,6 +85,217 @@ app.get('/api/health', (req, res) => {
 
 /**
  * @swagger
+ * /api/auth/signup:
+ *   post:
+ *     summary: User signup
+ *     description: Register a new user account
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: password123
+ *               fullName:
+ *                 type: string
+ *                 example: John Doe
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User registered successfully
+ *                 userId:
+ *                   type: string
+ *       400:
+ *         description: Bad request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+app.post('/api/auth/signup', (req, res) => {
+  const { email, password, fullName } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({
+      message: 'Email and password are required',
+      code: 'MISSING_FIELDS'
+    });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({
+      message: 'Password must be at least 6 characters',
+      code: 'WEAK_PASSWORD'
+    });
+  }
+
+  // Mock response - In production, integrate with Supabase or your auth system
+  res.status(201).json({
+    message: 'User registered successfully. Please check your email for verification.',
+    userId: 'user_' + Date.now(),
+    email: email
+  });
+});
+
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: User login
+ *     description: Authenticate a user and receive an access token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: user@example.com
+ *               password:
+ *                 type: string
+ *                 format: password
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login successful
+ *                 accessToken:
+ *                   type: string
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+app.post('/api/auth/login', (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({
+      message: 'Email and password are required',
+      code: 'MISSING_FIELDS'
+    });
+  }
+
+  // Mock response - In production, validate against your database/Supabase
+  // This is just for documentation purposes
+  res.json({
+    message: 'Login successful',
+    accessToken: 'mock_jwt_token_' + Date.now(),
+    user: {
+      id: 'user_123',
+      email: email,
+      fullName: 'John Doe'
+    }
+  });
+});
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: User logout
+ *     description: Logout the current user
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logout successful
+ */
+app.post('/api/auth/logout', (req, res) => {
+  res.json({
+    message: 'Logout successful'
+  });
+});
+
+/**
+ * @swagger
+ * /api/auth/me:
+ *   get:
+ *     summary: Get current user
+ *     description: Get the currently authenticated user's profile
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 fullName:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
+ */
+app.get('/api/auth/me', (req, res) => {
+  // Mock response - In production, validate JWT token
+  res.json({
+    id: 'user_123',
+    email: 'user@example.com',
+    fullName: 'John Doe'
+  });
+});
+
+/**
+ * @swagger
  * /api/destinations:
  *   get:
  *     summary: Get all destinations

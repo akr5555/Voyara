@@ -23,7 +23,54 @@ const options = {
       }
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Enter your JWT token'
+        }
+      },
       schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'User ID'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'User email'
+            },
+            fullName: {
+              type: 'string',
+              description: 'User full name'
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Account creation date'
+            }
+          }
+        },
+        AuthResponse: {
+          type: 'object',
+          properties: {
+            message: {
+              type: 'string',
+              description: 'Response message'
+            },
+            accessToken: {
+              type: 'string',
+              description: 'JWT access token'
+            },
+            user: {
+              $ref: '#/components/schemas/User'
+            }
+          }
+        },
         Destination: {
           type: 'object',
           properties: {
