@@ -245,8 +245,12 @@ app.get('/api/trips/:id', (req, res) => {
 app.use(express.static(path.join(__dirname, '../dist')));
 
 // The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
+// match API or Swagger routes, send back React's index.html file.
+app.get('*', (req, res, next) => {
+  // Skip if it's an API or Swagger route
+  if (req.path.startsWith('/api') || req.path.startsWith('/api-docs')) {
+    return next();
+  }
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
