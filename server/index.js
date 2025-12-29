@@ -9,17 +9,22 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Security Middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
+// Security Middleware - Disable for Swagger route
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api-docs')) {
+    return next();
+  }
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+      },
     },
-  },
-}));
+  })(req, res, next);
+});
 
 // Rate limiting to prevent abuse
 const limiter = rateLimit({
@@ -242,14 +247,20 @@ app.get('/api/trips/:id', (req, res) => {
   res.json(trip);
 });
 
+// Important: Static files and catch-all MUST be after all API routes
 // Serve static files from the React app (for production)
-app.use(express.static(path.join(__dirname, '../dist')));
+const distPath = path.join(__dirname, '../dist');
+app.use(express.static(distPath, { index: false }));
 
 // The "catchall" handler: for any request that doesn't
 // match API or Swagger routes, send back React's index.html file.
 // This must be the LAST route
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  // Don't handle API or api-docs routes
+  if (req.path.startsWith('/api') || req.path.startsWith('/api-docs')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  res.sendFile(path.join(distPath, 'index.html'));
 });
 
 // Start the server
