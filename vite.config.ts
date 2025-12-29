@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => ({
     host: "0.0.0.0",
     port: 10000,
     strictPort: true,
+    allowedHosts: [
+      "voyara.onrender.com",
+      ".onrender.com"
+    ],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
