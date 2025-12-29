@@ -2,21 +2,25 @@ const express = require('express');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpecs = require('./swagger');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// Swagger UI Route
+// Serve static files from the React app build
+app.use(express.static(path.join(__dirname, '../dist')));
+
+// API Routes with Swagger Documentation
+
+// Swagger UI Route - accessible at /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Voyara API Documentation',
 }));
-
-// Example API Routes with Swagger Documentation
 
 /**
  * @swagger
@@ -116,7 +120,6 @@ app.get('/api/trips', (req, res) => {
  */
 app.get('/api/trips/:id', (req, res) => {
   const { id } = req.params;
-  // Example response
   res.json({
     id: parseInt(id),
     title: 'European Adventure',
@@ -179,18 +182,16 @@ app.post('/api/trips', (req, res) => {
   });
 });
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to Voyara API',
-    documentation: '/api-docs'
-  });
+// Serve React app for all other routes (must be last)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📚 API Documentation available at http://localhost:${PORT}/api-docs`);
+  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
+  console.log(`🌐 Frontend: http://localhost:${PORT}`);
 });
 
 module.exports = app;

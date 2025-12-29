@@ -3,7 +3,20 @@ services:
     name: voyara
     runtime: node
     buildCommand: npm install && npm run build
-    startCommand: npm run preview -- --host 0.0.0.0 --port 10000
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
+      - key: VITE_SUPABASE_PROJECT_ID
+        sync: false
+      - key: VITE_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: VITE_SUPABASE_URL
+        sync: falsetype: web
+    name: voyara
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
     envVars:
       - key: NODE_VERSION
         value: 18.17.0

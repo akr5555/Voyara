@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "node server/index.js",
-    "server:dev": "nodemon server/index.js"
+    "start": "node server/index.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

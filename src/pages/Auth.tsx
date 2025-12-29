@@ -91,9 +91,7 @@ const Auth = () => {
 
         const redirectUrl = `${window.location.origin}/`;
 
-        console.log('🔐 Attempting signup with:', { email: formData.email, redirectUrl });
-
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
@@ -104,10 +102,7 @@ const Auth = () => {
           },
         });
 
-        console.log('📊 Signup response:', { data, error });
-
         if (error) {
-          console.error('❌ Signup error:', error);
           if (error.message.includes("already registered")) {
             toast({
               variant: "destructive",
@@ -122,24 +117,13 @@ const Auth = () => {
             });
           }
         } else {
-          console.log('✅ Signup successful!', data);
-          
-          // Check if email confirmation is required
-          if (data.user && !data.session) {
-            toast({
-              title: "Check your email!",
-              description: "We sent you a confirmation link. Please check your email to activate your account.",
-            });
-          } else {
-            toast({
-              title: "Account created!",
-              description: "Welcome to VOYARA! You are now logged in.",
-            });
-          }
+          toast({
+            title: "Account created!",
+            description: "Welcome to VOYARA! You are now logged in.",
+          });
         }
       }
     } catch (error) {
-      console.error('🚨 Caught error during auth:', error);
       toast({
         variant: "destructive",
         title: "Error",
