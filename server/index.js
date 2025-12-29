@@ -1,10 +1,14 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./swagger');
-const path = require('path');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
+import swaggerSpec from './swagger.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -270,4 +274,4 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌍 API endpoints available at http://localhost:${PORT}/api`);
 });
 
-module.exports = app;
+export default app;
