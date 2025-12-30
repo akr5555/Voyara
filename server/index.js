@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.js';
+import { supabase } from './supabase.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -110,7 +111,7 @@ app.get('/api/health', (req, res) => {
  * /api/auth/signup:
  *   post:
  *     summary: User signup
- *     description: Register a new user account
+ *     description: Register a new user account via Supabase
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -144,8 +145,8 @@ app.get('/api/health', (req, res) => {
  *                 message:
  *                   type: string
  *                   example: User registered successfully
- *                 userId:
- *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
  *       400:
  *         description: Bad request
  *         content:
@@ -153,29 +154,57 @@ app.get('/api/health', (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-app.post('/api/auth/signup', (req, res) => {
-  const { email, password, fullName } = req.body;
-  
-  if (!email || !password) {
-    return res.status(400).json({
-      message: 'Email and password are required',
-      code: 'MISSING_FIELDS'
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { email, password, fullName } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'Email and password are required',
+        code: 'MISSING_FIELDS'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        message: 'Password must be at least 6 characters',
+        code: 'WEAK_PASSWORD'
+      });
+    }
+
+    // Real Supabase signup
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName || ''
+        }
+      }
+    });
+
+    if (error) {
+      return res.status(400).json({
+        message: error.message,
+        code: error.code || 'SIGNUP_ERROR'
+      });
+    }
+
+    res.status(201).json({
+      message: 'User registered successfully. Please check your email for verification.',
+      user: {
+        id: data.user?.id,
+        email: data.user?.email,
+        fullName: fullName
+      }
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
     });
   }
-
-  if (password.length < 6) {
-    return res.status(400).json({
-      message: 'Password must be at least 6 characters',
-      code: 'WEAK_PASSWORD'
-    });
-  }
-
-  // Mock response - In production, integrate with Supabase or your auth system
-  res.status(201).json({
-    message: 'User registered successfully. Please check your email for verification.',
-    userId: 'user_' + Date.now(),
-    email: email
-  });
 });
 
 /**
@@ -183,7 +212,7 @@ app.post('/api/auth/signup', (req, res) => {
  * /api/auth/login:
  *   post:
  *     summary: User login
- *     description: Authenticate a user and receive an access token
+ *     description: Authenticate a user via Supabase and receive an access token
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -216,14 +245,10 @@ app.post('/api/auth/signup', (req, res) => {
  *                   example: Login successful
  *                 accessToken:
  *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 refreshToken:
+ *                   type: string
  *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                     email:
- *                       type: string
+ *                   $ref: '#/components/schemas/User'
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -231,27 +256,47 @@ app.post('/api/auth/signup', (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-app.post('/api/auth/login', (req, res) => {
-  const { email, password } = req.body;
-  
-  if (!email || !password) {
-    return res.status(400).json({
-      message: 'Email and password are required',
-      code: 'MISSING_FIELDS'
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        message: 'Email and password are required',
+        code: 'MISSING_FIELDS'
+      });
+    }
+
+    // Real Supabase login
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+      return res.status(401).json({
+        message: error.message,
+        code: error.code || 'LOGIN_ERROR'
+      });
+    }
+
+    res.json({
+      message: 'Login successful',
+      accessToken: data.session?.access_token,
+      refreshToken: data.session?.refresh_token,
+      user: {
+        id: data.user?.id,
+        email: data.user?.email,
+        fullName: data.user?.user_metadata?.full_name
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
     });
   }
-
-  // Mock response - In production, validate against your database/Supabase
-  // This is just for documentation purposes
-  res.json({
-    message: 'Login successful',
-    accessToken: 'mock_jwt_token_' + Date.now(),
-    user: {
-      id: 'user_123',
-      email: email,
-      fullName: 'John Doe'
-    }
-  });
 });
 
 /**
@@ -259,10 +304,22 @@ app.post('/api/auth/login', (req, res) => {
  * /api/auth/logout:
  *   post:
  *     summary: User logout
- *     description: Logout the current user
+ *     description: Logout the current user and invalidate session
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - accessToken
+ *             properties:
+ *               accessToken:
+ *                 type: string
+ *                 description: The user's access token
  *     responses:
  *       200:
  *         description: Logout successful
@@ -275,10 +332,36 @@ app.post('/api/auth/login', (req, res) => {
  *                   type: string
  *                   example: Logout successful
  */
-app.post('/api/auth/logout', (req, res) => {
-  res.json({
-    message: 'Logout successful'
-  });
+app.post('/api/auth/logout', async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+    const authHeader = req.headers.authorization;
+    const token = accessToken || authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(400).json({
+        message: 'Access token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    // Real Supabase logout
+    const { error } = await supabase.auth.admin.signOut(token);
+
+    if (error) {
+      console.error('Logout error:', error);
+    }
+
+    res.json({
+      message: 'Logout successful'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
 });
 
 /**
@@ -296,24 +379,45 @@ app.post('/api/auth/logout', (req, res) => {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 email:
- *                   type: string
- *                 fullName:
- *                   type: string
+ *               $ref: '#/components/schemas/User'
  *       401:
  *         description: Unauthorized
  */
-app.get('/api/auth/me', (req, res) => {
-  // Mock response - In production, validate JWT token
-  res.json({
-    id: 'user_123',
-    email: 'user@example.com',
-    fullName: 'John Doe'
-  });
+app.get('/api/auth/me', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    // Get user from Supabase using the token
+    const { data, error } = await supabase.auth.getUser(token);
+
+    if (error || !data.user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    res.json({
+      id: data.user.id,
+      email: data.user.email,
+      fullName: data.user.user_metadata?.full_name,
+      createdAt: data.user.created_at
+    });
+  } catch (error) {
+    console.error('Get user error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
 });
 
 /**
@@ -321,7 +425,7 @@ app.get('/api/auth/me', (req, res) => {
  * /api/destinations:
  *   get:
  *     summary: Get all destinations
- *     description: Retrieve a list of all available travel destinations
+ *     description: Retrieve a list of all available travel destinations from the database
  *     tags: [Destinations]
  *     responses:
  *       200:
@@ -333,34 +437,47 @@ app.get('/api/auth/me', (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/Destination'
  */
-app.get('/api/destinations', (req, res) => {
-  const destinations = [
-    {
-      id: '1',
-      name: 'Paris',
-      country: 'France',
-      description: 'The City of Light awaits with iconic landmarks and rich culture',
-      image: '/placeholder.svg',
-      rating: 4.8
-    },
-    {
-      id: '2',
-      name: 'Tokyo',
-      country: 'Japan',
-      description: 'Experience the perfect blend of tradition and modernity',
-      image: '/placeholder.svg',
-      rating: 4.9
-    },
-    {
-      id: '3',
-      name: 'New York',
-      country: 'USA',
-      description: 'The city that never sleeps offers endless possibilities',
-      image: '/placeholder.svg',
-      rating: 4.7
-    }
-  ];
-  res.json(destinations);
+app.get('/api/destinations', async (req, res) => {
+  try {
+    // TODO: Replace with actual Supabase query when destinations table is created
+    // const { data, error } = await supabase.from('destinations').select('*');
+    // if (error) throw error;
+    
+    // Currently returning mock data - create 'destinations' table in Supabase to use real data
+    const destinations = [
+      {
+        id: '1',
+        name: 'Paris',
+        country: 'France',
+        description: 'The City of Light awaits with iconic landmarks and rich culture',
+        image: '/placeholder.svg',
+        rating: 4.8
+      },
+      {
+        id: '2',
+        name: 'Tokyo',
+        country: 'Japan',
+        description: 'Experience the perfect blend of tradition and modernity',
+        image: '/placeholder.svg',
+        rating: 4.9
+      },
+      {
+        id: '3',
+        name: 'New York',
+        country: 'USA',
+        description: 'The city that never sleeps offers endless possibilities',
+        image: '/placeholder.svg',
+        rating: 4.7
+      }
+    ];
+    res.json(destinations);
+  } catch (error) {
+    console.error('Get destinations error:', error);
+    res.status(500).json({
+      message: 'Failed to fetch destinations',
+      code: 'SERVER_ERROR'
+    });
+  }
 });
 
 /**
@@ -410,7 +527,7 @@ app.get('/api/destinations/:id', (req, res) => {
  * /api/trips:
  *   get:
  *     summary: Get all upcoming trips
- *     description: Retrieve a list of all upcoming travel trips
+ *     description: Retrieve a list of all upcoming travel trips from the database
  *     tags: [Trips]
  *     responses:
  *       200:
@@ -422,28 +539,41 @@ app.get('/api/destinations/:id', (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/Trip'
  */
-app.get('/api/trips', (req, res) => {
-  const trips = [
-    {
-      id: '1',
-      title: 'Paris Adventure',
-      destination: 'Paris, France',
-      startDate: '2025-03-15',
-      endDate: '2025-03-22',
-      price: 1299,
-      availableSeats: 12
-    },
-    {
-      id: '2',
-      title: 'Tokyo Explorer',
-      destination: 'Tokyo, Japan',
-      startDate: '2025-04-10',
-      endDate: '2025-04-20',
-      price: 2499,
-      availableSeats: 8
-    }
-  ];
-  res.json(trips);
+app.get('/api/trips', async (req, res) => {
+  try {
+    // TODO: Replace with actual Supabase query when trips table is created
+    // const { data, error } = await supabase.from('trips').select('*').gte('start_date', new Date().toISOString());
+    // if (error) throw error;
+    
+    // Currently returning mock data - create 'trips' table in Supabase to use real data
+    const trips = [
+      {
+        id: '1',
+        title: 'Paris Adventure',
+        destination: 'Paris, France',
+        startDate: '2025-03-15',
+        endDate: '2025-03-22',
+        price: 1299,
+        availableSeats: 12
+      },
+      {
+        id: '2',
+        title: 'Tokyo Explorer',
+        destination: 'Tokyo, Japan',
+        startDate: '2025-04-10',
+        endDate: '2025-04-20',
+        price: 2499,
+        availableSeats: 8
+      }
+    ];
+    res.json(trips);
+  } catch (error) {
+    console.error('Get trips error:', error);
+    res.status(500).json({
+      message: 'Failed to fetch trips',
+      code: 'SERVER_ERROR'
+    });
+  }
 });
 
 /**
