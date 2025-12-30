@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plane } from "lucide-react";
+import { Plane, Home, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -158,12 +158,29 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4 py-8 relative">
+      {/* Back to Home Button - Top Left */}
+      <Link 
+        to="/" 
+        className="absolute top-6 left-6 group"
+      >
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-2 bg-white/90 hover:bg-white border-2 border-slate-200 hover:border-indigo-400 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2 h-auto"
+        >
+          <ArrowLeft className="w-4 h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
+          <Home className="w-4 h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
+          <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors">
+            Back to Home
+          </span>
+        </Button>
+      </Link>
+
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300">
               <Plane className="w-8 h-8 text-primary-foreground" />
             </div>
           </Link>
@@ -264,13 +281,25 @@ const Auth = () => {
               </div>
             )}
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl text-base"
-            >
-              {isLoading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
-            </Button>
+            <div className="flex gap-3">
+              <Link to="/" className="flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isLoading}
+                  className="w-full h-12 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-base transition-all"
+                >
+                  Cancel
+                </Button>
+              </Link>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl text-base shadow-lg hover:shadow-xl transition-all"
+              >
+                {isLoading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
+              </Button>
+            </div>
           </form>
 
           <div className="mt-6 text-center">
