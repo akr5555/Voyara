@@ -171,7 +171,7 @@ const Auth = () => {
           <ArrowLeft className="w-4 h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
           <Home className="w-4 h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
           <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors">
-            Back to Home
+            
           </span>
         </Button>
       </Link>

@@ -113,6 +113,8 @@ const Profile = () => {
         updated_at: new Date().toISOString()
       };
       
+      console.log('💾 Attempting to save profile:', updateData);
+      
       const { error } = await (supabase as unknown as {
         from: (table: string) => {
           upsert: (data: typeof updateData) => Promise<{ error: Error | null }>
@@ -121,7 +123,14 @@ const Profile = () => {
         .from('user_profiles')
         .upsert(updateData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Supabase error details:', error);
+        console.error('Error message:', error.message);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        throw error;
+      }
+
+      console.log('✅ Profile saved successfully');
 
       // Dispatch custom event to notify Header to refresh
       window.dispatchEvent(new CustomEvent('profileUpdated', { detail: { full_name: profile.full_name } }));
@@ -131,11 +140,27 @@ const Profile = () => {
         description: "Your profile has been updated."
       });
     } catch (error: unknown) {
-      console.error('Save error:', error);
+      console.error('🚨 Save error:', error);
+      
+      // Check if it's a table doesn't exist error
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Full error message:', errorMessage);
+      
+      const isTableMissing = errorMessage.includes('relation') && errorMessage.includes('does not exist');
+      const isPermissionError = errorMessage.includes('permission') || errorMessage.includes('policy');
+      
+      let description = errorMessage;
+      
+      if (isTableMissing) {
+        description = "Database table 'user_profiles' not found. Please run the migration in Supabase SQL Editor:\n\nsupabase/migrations/002_check_and_fix.sql";
+      } else if (isPermissionError) {
+        description = "Permission denied. Please check RLS policies in Supabase.";
+      }
+      
       toast({
         variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to save profile"
+        title: "Failed to save profile",
+        description: description
       });
     } finally {
       setSaving(false);
