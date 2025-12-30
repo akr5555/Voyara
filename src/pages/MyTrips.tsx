@@ -132,6 +132,16 @@ const MyTrips = () => {
         <div className="absolute top-10 left-10 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
+        
+        {/* 3D Floating Boxes */}
+        <div className="absolute top-32 left-[10%] w-24 h-24 bg-gradient-to-br from-indigo-400/20 to-blue-500/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-2xl transform rotate-12 animate-float"></div>
+        <div className="absolute top-52 right-[16%] w-32 h-32 bg-gradient-to-br from-blue-400/15 to-purple-500/15 backdrop-blur-sm border border-white/20 rounded-xl shadow-xl transform -rotate-6 animate-float-delay-2"></div>
+        <div className="absolute bottom-44 left-[20%] w-20 h-20 bg-gradient-to-br from-purple-400/20 to-indigo-500/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-lg transform rotate-45 animate-float-delay-1"></div>
+        <div className="absolute bottom-60 right-[24%] w-28 h-28 bg-gradient-to-br from-indigo-300/15 to-blue-400/15 backdrop-blur-sm border border-white/25 rounded-xl shadow-xl transform -rotate-12 animate-float-delay-3"></div>
+        <div className="absolute top-[50%] left-[7%] w-16 h-16 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 backdrop-blur-sm border border-white/30 rounded-md shadow-lg transform rotate-30 animate-float-delay-15"></div>
+        <div className="absolute top-[35%] right-[11%] w-20 h-20 bg-gradient-to-br from-purple-400/15 to-blue-500/15 backdrop-blur-sm border border-white/20 rounded-lg shadow-xl transform -rotate-20 animate-float-delay-25"></div>
+        <div className="absolute top-[20%] left-[50%] w-12 h-12 bg-gradient-to-br from-indigo-500/10 to-blue-400/10 backdrop-blur-sm border border-white/20 rounded-md shadow-md transform rotate-6 animate-float-delay-05"></div>
+        <div className="absolute bottom-[28%] right-[9%] w-14 h-14 bg-gradient-to-br from-blue-400/15 to-purple-500/15 backdrop-blur-sm border border-white/25 rounded-lg shadow-lg transform -rotate-15 animate-float-delay-35"></div>
       </div>
 
       <Header />

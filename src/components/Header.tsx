@@ -18,6 +18,7 @@ const Header = () => {
       }
 
       try {
+        console.log('Fetching profile for user:', user.id);
         const result = await (supabase as unknown as {
           from: (table: string) => {
             select: (cols: string) => {
@@ -33,11 +34,13 @@ const Header = () => {
           .single();
 
         const { data } = result;
+        console.log('Profile fetch result:', data);
         if (data?.full_name) {
           setProfileName(data.full_name);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
       }
     };
 
@@ -72,12 +75,12 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-coral-light/95 to-peach/95 backdrop-blur-md border-b border-white/20">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-coral-light/95 to-peach/95 backdrop-blur-md border-b border-white/20 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <a href="#home" className="flex items-center gap-2">
-            <span className="text-2xl font-display font-bold text-gray-900 tracking-tight">
+            <span className="text-2xl font-display font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
               VOYARA
             </span>
           </a>
@@ -91,8 +94,8 @@ const Header = () => {
                   to={link.href}
                   className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     link.label === "Home"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-800 hover:bg-white/50"
+                      ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md"
+                      : "text-slate-700 hover:bg-white/50"
                   }`}
                 >
                   {link.label}
@@ -103,8 +106,8 @@ const Header = () => {
                   href={link.href}
                   className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     link.label === "Home"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-gray-800 hover:bg-white/50"
+                      ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md"
+                      : "text-slate-700 hover:bg-white/50"
                   }`}
                 >
                   {link.label}
@@ -114,7 +117,7 @@ const Header = () => {
             {user && (
               <Link
                 to="/profile"
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-800 hover:bg-white/50 transition-all duration-200"
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-slate-700 hover:bg-white/50 transition-all duration-200"
               >
                 <User className="w-4 h-4" />
                 <span>Profile</span>
@@ -129,8 +132,8 @@ const Header = () => {
             ) : user ? (
               <>
                 <div className="flex items-center gap-2 px-4 py-2 bg-white/70 rounded-full">
-                  <User className="w-4 h-4 text-gray-700" />
-                  <span className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
+                  <User className="w-4 h-4 text-indigo-600" />
+                  <span className="text-sm font-medium text-slate-800 truncate max-w-[150px]">
                     {displayName}
                   </span>
                 </div>
@@ -138,7 +141,7 @@ const Header = () => {
                   variant="ghost" 
                   size="sm"
                   onClick={handleSignOut}
-                  className="text-sm font-medium gap-2 hover:bg-white/50 text-gray-800"
+                  className="text-sm font-medium gap-2 hover:bg-white/50 text-slate-700"
                 >
                   <LogOut className="w-4 h-4" />
                   Logout
@@ -149,13 +152,13 @@ const Header = () => {
                 <Link to="/auth">
                   <Button 
                     variant="ghost" 
-                    className="text-sm font-medium text-gray-800 hover:bg-white/50 px-5 py-2 rounded-full"
+                    className="text-sm font-medium text-slate-700 hover:bg-white/50 px-5 py-2 rounded-full"
                   >
                     Sign in
                   </Button>
                 </Link>
                 <Link to="/auth">
-                  <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6 py-2 shadow-md">
+                  <Button className="bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-full px-6 py-2 shadow-md">
                     Register
                   </Button>
                 </Link>
@@ -166,7 +169,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-gray-900"
+            className="md:hidden p-2 text-slate-800"
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -183,8 +186,8 @@ const Header = () => {
                     to={link.href}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                       link.label === "Home"
-                        ? "bg-white text-gray-900"
-                        : "text-gray-800 hover:bg-white/50"
+                        ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white"
+                        : "text-slate-700 hover:bg-white/50"
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -196,8 +199,8 @@ const Header = () => {
                     href={link.href}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                       link.label === "Home"
-                        ? "bg-white text-gray-900"
-                        : "text-gray-800 hover:bg-white/50"
+                        ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white"
+                        : "text-slate-700 hover:bg-white/50"
                     }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -209,15 +212,15 @@ const Header = () => {
                 {user ? (
                   <>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white/70 rounded-lg">
-                      <User className="w-4 h-4 text-gray-700" />
-                      <span className="text-sm font-medium text-gray-900">
+                      <User className="w-4 h-4 text-indigo-600" />
+                      <span className="text-sm font-medium text-slate-800">
                         {displayName}
                       </span>
                     </div>
                     <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
                       <Button 
                         variant="ghost" 
-                        className="w-full justify-start gap-2 text-gray-800 hover:bg-white/50"
+                        className="w-full justify-start gap-2 text-slate-700 hover:bg-white/50"
                       >
                         <User className="w-4 h-4" />
                         Profile
@@ -226,7 +229,7 @@ const Header = () => {
                     <Button 
                       variant="ghost" 
                       onClick={handleSignOut}
-                      className="w-full justify-start gap-2 text-gray-800 hover:bg-white/50"
+                      className="w-full justify-start gap-2 text-slate-700 hover:bg-white/50"
                     >
                       <LogOut className="w-4 h-4" />
                       Logout
@@ -235,12 +238,12 @@ const Header = () => {
                 ) : (
                   <>
                     <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="ghost" className="w-full justify-start text-gray-800 hover:bg-white/50">
+                      <Button variant="ghost" className="w-full justify-start text-slate-700 hover:bg-white/50">
                         Sign in
                       </Button>
                     </Link>
                     <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                      <Button className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full">
+                      <Button className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white rounded-full">
                         Register
                       </Button>
                     </Link>
