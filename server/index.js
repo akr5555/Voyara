@@ -427,6 +427,17 @@ app.get('/api/auth/me', async (req, res) => {
  *     summary: Get all destinations
  *     description: Retrieve a list of all available travel destinations from the database
  *     tags: [Destinations]
+ *     parameters:
+ *       - in: query
+ *         name: country
+ *         schema:
+ *           type: string
+ *         description: Filter by country
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search in name, country, or description
  *     responses:
  *       200:
  *         description: A list of destinations
@@ -439,42 +450,33 @@ app.get('/api/auth/me', async (req, res) => {
  */
 app.get('/api/destinations', async (req, res) => {
   try {
-    // TODO: Replace with actual Supabase query when destinations table is created
-    // const { data, error } = await supabase.from('destinations').select('*');
-    // if (error) throw error;
-    
-    // Currently returning mock data - create 'destinations' table in Supabase to use real data
-    const destinations = [
-      {
-        id: '1',
-        name: 'Paris',
-        country: 'France',
-        description: 'The City of Light awaits with iconic landmarks and rich culture',
-        image: '/placeholder.svg',
-        rating: 4.8
-      },
-      {
-        id: '2',
-        name: 'Tokyo',
-        country: 'Japan',
-        description: 'Experience the perfect blend of tradition and modernity',
-        image: '/placeholder.svg',
-        rating: 4.9
-      },
-      {
-        id: '3',
-        name: 'New York',
-        country: 'USA',
-        description: 'The city that never sleeps offers endless possibilities',
-        image: '/placeholder.svg',
-        rating: 4.7
-      }
-    ];
-    res.json(destinations);
+    let query = supabase.from('destinations').select('*');
+
+    // Apply filters
+    if (req.query.country) {
+      query = query.eq('country', req.query.country);
+    }
+
+    if (req.query.search) {
+      const searchTerm = `%${req.query.search}%`;
+      query = query.or(`name.ilike.${searchTerm},country.ilike.${searchTerm},description.ilike.${searchTerm}`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Get destinations error:', error);
+      return res.status(500).json({
+        message: 'Failed to fetch destinations',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json(data || []);
   } catch (error) {
     console.error('Get destinations error:', error);
     res.status(500).json({
-      message: 'Failed to fetch destinations',
+      message: 'Internal server error',
       code: 'SERVER_ERROR'
     });
   }
@@ -508,69 +510,234 @@ app.get('/api/destinations', async (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-app.get('/api/destinations/:id', (req, res) => {
-  const { id } = req.params;
-  // Mock response - integrate with your database
-  const destination = {
-    id,
-    name: 'Paris',
-    country: 'France',
-    description: 'The City of Light awaits with iconic landmarks and rich culture',
-    image: '/placeholder.svg',
-    rating: 4.8
-  };
-  res.json(destination);
+app.get('/api/destinations/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    const { data, error } = await supabase
+      .from('destinations')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      return res.status(404).json({
+        message: 'Destination not found',
+        code: 'NOT_FOUND'
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Get destination error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
 });
 
 /**
  * @swagger
  * /api/trips:
  *   get:
- *     summary: Get all upcoming trips
- *     description: Retrieve a list of all upcoming travel trips from the database
+ *     summary: Get user's trips
+ *     description: Retrieve all trips created by the authenticated user
  *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [planning, ongoing, completed, cancelled]
+ *         description: Filter by trip status
  *     responses:
  *       200:
- *         description: A list of trips
+ *         description: List of user's trips
  *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Trip'
+ *       401:
+ *         description: Unauthorized
  */
 app.get('/api/trips', async (req, res) => {
   try {
-    // TODO: Replace with actual Supabase query when trips table is created
-    // const { data, error } = await supabase.from('trips').select('*').gte('start_date', new Date().toISOString());
-    // if (error) throw error;
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    // Verify user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
-    // Currently returning mock data - create 'trips' table in Supabase to use real data
-    const trips = [
-      {
-        id: '1',
-        title: 'Paris Adventure',
-        destination: 'Paris, France',
-        startDate: '2025-03-15',
-        endDate: '2025-03-22',
-        price: 1299,
-        availableSeats: 12
-      },
-      {
-        id: '2',
-        title: 'Tokyo Explorer',
-        destination: 'Tokyo, Japan',
-        startDate: '2025-04-10',
-        endDate: '2025-04-20',
-        price: 2499,
-        availableSeats: 8
-      }
-    ];
-    res.json(trips);
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    // Build query
+    let query = supabase
+      .from('trips')
+      .select(`
+        *,
+        trip_destinations (
+          destination_id,
+          destinations (
+            id,
+            name,
+            country,
+            image
+          )
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    // Apply status filter if provided
+    if (req.query.status) {
+      query = query.eq('status', req.query.status);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Get trips error:', error);
+      return res.status(500).json({
+        message: 'Failed to fetch trips',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json(data || []);
   } catch (error) {
     console.error('Get trips error:', error);
     res.status(500).json({
-      message: 'Failed to fetch trips',
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/trips:
+ *   post:
+ *     summary: Create a new trip
+ *     description: Create a new travel trip for the authenticated user
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - startDate
+ *               - endDate
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Summer Europe Tour
+ *               description:
+ *                 type: string
+ *                 example: A memorable journey through European cities
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *                 example: 2025-07-01
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *                 example: 2025-07-15
+ *               coverPhoto:
+ *                 type: string
+ *                 example: https://example.com/photo.jpg
+ *               budget:
+ *                 type: number
+ *                 example: 5000
+ *     responses:
+ *       201:
+ *         description: Trip created successfully
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized
+ */
+app.post('/api/trips', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    // Verify user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { name, description, startDate, endDate, coverPhoto, budget } = req.body;
+
+    if (!name || !startDate || !endDate) {
+      return res.status(400).json({
+        message: 'Name, start date, and end date are required',
+        code: 'MISSING_FIELDS'
+      });
+    }
+
+    // Create trip in database
+    const { data, error } = await supabase
+      .from('trips')
+      .insert({
+        user_id: user.id,
+        name,
+        description,
+        start_date: startDate,
+        end_date: endDate,
+        cover_photo: coverPhoto,
+        budget,
+        status: 'planning'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Create trip error:', error);
+      return res.status(500).json({
+        message: 'Failed to create trip',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Create trip error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
       code: 'SERVER_ERROR'
     });
   }
@@ -612,6 +779,756 @@ app.get('/api/trips/:id', (req, res) => {
     availableSeats: 12
   };
   res.json(trip);
+});
+
+/**
+ * @swagger
+ * /api/trips/{id}:
+ *   put:
+ *     summary: Update a trip
+ *     description: Update an existing trip (user must be the owner)
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Trip ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               coverPhoto:
+ *                 type: string
+ *               budget:
+ *                 type: number
+ *               status:
+ *                 type: string
+ *                 enum: [planning, ongoing, completed, cancelled]
+ *     responses:
+ *       200:
+ *         description: Trip updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - not the trip owner
+ *       404:
+ *         description: Trip not found
+ */
+app.put('/api/trips/:id', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { id } = req.params;
+    const { name, description, startDate, endDate, coverPhoto, budget, status } = req.body;
+
+    // Check if trip exists and user is owner
+    const { data: existingTrip, error: fetchError } = await supabase
+      .from('trips')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingTrip) {
+      return res.status(404).json({
+        message: 'Trip not found',
+        code: 'NOT_FOUND'
+      });
+    }
+
+    if (existingTrip.user_id !== user.id) {
+      return res.status(403).json({
+        message: 'You do not have permission to update this trip',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Update trip
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (startDate !== undefined) updateData.start_date = startDate;
+    if (endDate !== undefined) updateData.end_date = endDate;
+    if (coverPhoto !== undefined) updateData.cover_photo = coverPhoto;
+    if (budget !== undefined) updateData.budget = budget;
+    if (status !== undefined) updateData.status = status;
+
+    const { data, error } = await supabase
+      .from('trips')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update trip error:', error);
+      return res.status(500).json({
+        message: 'Failed to update trip',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Update trip error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/trips/{id}:
+ *   delete:
+ *     summary: Delete a trip
+ *     description: Delete a trip (user must be the owner)
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Trip ID
+ *     responses:
+ *       200:
+ *         description: Trip deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - not the trip owner
+ *       404:
+ *         description: Trip not found
+ */
+app.delete('/api/trips/:id', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { id } = req.params;
+
+    // Check if trip exists and user is owner
+    const { data: existingTrip, error: fetchError } = await supabase
+      .from('trips')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingTrip) {
+      return res.status(404).json({
+        message: 'Trip not found',
+        code: 'NOT_FOUND'
+      });
+    }
+
+    if (existingTrip.user_id !== user.id) {
+      return res.status(403).json({
+        message: 'You do not have permission to delete this trip',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Delete trip (cascade will handle trip_destinations)
+    const { error } = await supabase
+      .from('trips')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Delete trip error:', error);
+      return res.status(500).json({
+        message: 'Failed to delete trip',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json({ message: 'Trip deleted successfully' });
+  } catch (error) {
+    console.error('Delete trip error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/trips/{id}/destinations:
+ *   post:
+ *     summary: Add destination to trip
+ *     description: Add a destination to an existing trip
+ *     tags: [Trips]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Trip ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - destinationId
+ *             properties:
+ *               destinationId:
+ *                 type: string
+ *                 example: "550e8400-e29b-41d4-a716-446655440000"
+ *               visitOrder:
+ *                 type: integer
+ *                 example: 1
+ *               notes:
+ *                 type: string
+ *                 example: "Visit the Eiffel Tower"
+ *     responses:
+ *       201:
+ *         description: Destination added to trip
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden
+ *       404:
+ *         description: Trip not found
+ */
+app.post('/api/trips/:id/destinations', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { id } = req.params;
+    const { destinationId, visitOrder, notes } = req.body;
+
+    if (!destinationId) {
+      return res.status(400).json({
+        message: 'Destination ID is required',
+        code: 'MISSING_FIELDS'
+      });
+    }
+
+    // Check if trip exists and user is owner
+    const { data: existingTrip, error: fetchError } = await supabase
+      .from('trips')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+
+    if (fetchError || !existingTrip) {
+      return res.status(404).json({
+        message: 'Trip not found',
+        code: 'NOT_FOUND'
+      });
+    }
+
+    if (existingTrip.user_id !== user.id) {
+      return res.status(403).json({
+        message: 'You do not have permission to modify this trip',
+        code: 'FORBIDDEN'
+      });
+    }
+
+    // Add destination to trip
+    const { data, error } = await supabase
+      .from('trip_destinations')
+      .insert({
+        trip_id: id,
+        destination_id: destinationId,
+        visit_order: visitOrder,
+        notes
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Add destination error:', error);
+      return res.status(500).json({
+        message: 'Failed to add destination to trip',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Add destination error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/profile:
+ *   get:
+ *     summary: Get user profile
+ *     description: Retrieve the authenticated user's profile information
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile data
+ *       401:
+ *         description: Unauthorized
+ */
+app.get('/api/profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    // Get user profile from database
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error) {
+      console.error('Get profile error:', error);
+      return res.status(500).json({
+        message: 'Failed to fetch profile',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/profile:
+ *   put:
+ *     summary: Update user profile
+ *     description: Update the authenticated user's profile information
+ *     tags: [Profile]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: John Doe
+ *               avatarUrl:
+ *                 type: string
+ *                 example: https://example.com/avatar.jpg
+ *               bio:
+ *                 type: string
+ *                 example: Travel enthusiast and photographer
+ *               language:
+ *                 type: string
+ *                 example: en
+ *               preferences:
+ *                 type: object
+ *                 example: {"theme": "dark", "notifications": true}
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       401:
+ *         description: Unauthorized
+ */
+app.put('/api/profile', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { fullName, avatarUrl, bio, language, preferences } = req.body;
+
+    // Build update data
+    const updateData = {};
+    if (fullName !== undefined) updateData.full_name = fullName;
+    if (avatarUrl !== undefined) updateData.avatar_url = avatarUrl;
+    if (bio !== undefined) updateData.bio = bio;
+    if (language !== undefined) updateData.language = language;
+    if (preferences !== undefined) updateData.preferences = preferences;
+
+    // Update profile
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update(updateData)
+      .eq('id', user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Update profile error:', error);
+      return res.status(500).json({
+        message: 'Failed to update profile',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Update profile error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/destinations/saved:
+ *   get:
+ *     summary: Get saved destinations
+ *     description: Retrieve all destinations saved by the authenticated user
+ *     tags: [Destinations]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of saved destinations
+ *       401:
+ *         description: Unauthorized
+ */
+app.get('/api/destinations/saved', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    // Get saved destinations with full destination details
+    const { data, error } = await supabase
+      .from('saved_destinations')
+      .select(`
+        *,
+        destinations (
+          id,
+          name,
+          country,
+          description,
+          image,
+          latitude,
+          longitude
+        )
+      `)
+      .eq('user_id', user.id)
+      .order('saved_at', { ascending: false });
+
+    if (error) {
+      console.error('Get saved destinations error:', error);
+      return res.status(500).json({
+        message: 'Failed to fetch saved destinations',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json(data || []);
+  } catch (error) {
+    console.error('Get saved destinations error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/destinations/{id}/save:
+ *   post:
+ *     summary: Save a destination
+ *     description: Add a destination to the user's saved list
+ *     tags: [Destinations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Destination ID
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               notes:
+ *                 type: string
+ *                 example: Want to visit during cherry blossom season
+ *     responses:
+ *       201:
+ *         description: Destination saved successfully
+ *       401:
+ *         description: Unauthorized
+ *       409:
+ *         description: Destination already saved
+ */
+app.post('/api/destinations/:id/save', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { id } = req.params;
+    const { notes } = req.body;
+
+    // Check if already saved
+    const { data: existing } = await supabase
+      .from('saved_destinations')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('destination_id', id)
+      .single();
+
+    if (existing) {
+      return res.status(409).json({
+        message: 'Destination already saved',
+        code: 'ALREADY_SAVED'
+      });
+    }
+
+    // Save destination
+    const { data, error } = await supabase
+      .from('saved_destinations')
+      .insert({
+        user_id: user.id,
+        destination_id: id,
+        notes
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Save destination error:', error);
+      return res.status(500).json({
+        message: 'Failed to save destination',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Save destination error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /api/destinations/{id}/save:
+ *   delete:
+ *     summary: Unsave a destination
+ *     description: Remove a destination from the user's saved list
+ *     tags: [Destinations]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Destination ID
+ *     responses:
+ *       200:
+ *         description: Destination unsaved successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Saved destination not found
+ */
+app.delete('/api/destinations/:id/save', async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({
+        message: 'Authorization token is required',
+        code: 'MISSING_TOKEN'
+      });
+    }
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return res.status(401).json({
+        message: 'Invalid or expired token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    const { id } = req.params;
+
+    // Delete saved destination
+    const { error } = await supabase
+      .from('saved_destinations')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('destination_id', id);
+
+    if (error) {
+      console.error('Unsave destination error:', error);
+      return res.status(500).json({
+        message: 'Failed to unsave destination',
+        code: 'DATABASE_ERROR'
+      });
+    }
+
+    res.json({ message: 'Destination unsaved successfully' });
+  } catch (error) {
+    console.error('Unsave destination error:', error);
+    res.status(500).json({
+      message: 'Internal server error',
+      code: 'SERVER_ERROR'
+    });
+  }
 });
 
 // Important: Static files and catch-all MUST be after all API routes

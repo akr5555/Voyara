@@ -14,7 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      user_profiles: {
+        Row: {
+          id: string
+          user_id: string
+          full_name: string | null
+          bio: string | null
+          avatar_url: string | null
+          language: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          full_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          language?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          full_name?: string | null
+          bio?: string | null
+          avatar_url?: string | null
+          language?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      trips: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string | null
+          start_date: string
+          end_date: string
+          cover_image_url: string | null
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description?: string | null
+          start_date: string
+          end_date: string
+          cover_image_url?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string | null
+          start_date?: string
+          end_date?: string
+          cover_image_url?: string | null
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      destinations: {
+        Row: {
+          id: string
+          name: string
+          country: string
+          description: string | null
+          image_url: string | null
+          latitude: number | null
+          longitude: number | null
+          category: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          country: string
+          description?: string | null
+          image_url?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          category?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          country?: string
+          description?: string | null
+          image_url?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          category?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      trip_destinations: {
+        Row: {
+          id: string
+          trip_id: string
+          destination_id: string
+          order_index: number
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          trip_id: string
+          destination_id: string
+          order_index?: number
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          trip_id?: string
+          destination_id?: string
+          order_index?: number
+          notes?: string | null
+          created_at?: string
+        }
+      }
+      saved_destinations: {
+        Row: {
+          id: string
+          user_id: string
+          destination_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          destination_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          destination_id?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never

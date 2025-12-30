@@ -1,17 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, loading } = useAuth();
+  const [profileName, setProfileName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) {
+        setProfileName(null);
+        return;
+      }
+
+      try {
+        const result = await (supabase as unknown as {
+          from: (table: string) => {
+            select: (cols: string) => {
+              eq: (col: string, val: string) => {
+                single: () => Promise<{ data: { full_name: string | null } | null; error: unknown }>
+              }
+            }
+          }
+        })
+          .from('user_profiles')
+          .select('full_name')
+          .eq('user_id', user.id)
+          .single();
+
+        const { data } = result;
+        if (data?.full_name) {
+          setProfileName(data.full_name);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+
+    // Listen for profile updates
+    const handleProfileUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent<{ full_name: string }>;
+      if (customEvent.detail?.full_name) {
+        setProfileName(customEvent.detail.full_name);
+      }
+    };
+
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+    };
+  }, [user]);
+
+  const displayName = profileName || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
 
   const navLinks = [
-    { label: "Home", href: "#home" },
-    { label: "Explore", href: "#explore" },
-    { label: "My Trip", href: "#trips" },
+    { label: "Home", href: "/", isRoute: true },
+    { label: "Explore", href: "#explore", isRoute: false },
+    { label: "My Trip", href: "/my-trips", isRoute: true },
   ];
 
   const handleSignOut = async () => {
@@ -32,27 +84,41 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  link.label === "Home"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-800 hover:bg-white/50"
-                }`}
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => 
+              link.isRoute ? (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    link.label === "Home"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-800 hover:bg-white/50"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    link.label === "Home"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-800 hover:bg-white/50"
+                  }`}
+                >
+                  {link.label}
+                </a>
+              )
+            )}
             {user && (
-              <a
-                href="#profile"
+              <Link
+                to="/profile"
                 className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-gray-800 hover:bg-white/50 transition-all duration-200"
               >
                 <User className="w-4 h-4" />
                 <span>Profile</span>
-              </a>
+              </Link>
             )}
           </nav>
 
@@ -65,7 +131,7 @@ const Header = () => {
                 <div className="flex items-center gap-2 px-4 py-2 bg-white/70 rounded-full">
                   <User className="w-4 h-4 text-gray-700" />
                   <span className="text-sm font-medium text-gray-900 truncate max-w-[150px]">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                    {displayName}
                   </span>
                 </div>
                 <Button 
@@ -110,29 +176,53 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-white/20 pt-4 animate-fade-in">
             <nav className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    link.label === "Home"
-                      ? "bg-white text-gray-900"
-                      : "text-gray-800 hover:bg-white/50"
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) => 
+                link.isRoute ? (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      link.label === "Home"
+                        ? "bg-white text-gray-900"
+                        : "text-gray-800 hover:bg-white/50"
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      link.label === "Home"
+                        ? "bg-white text-gray-900"
+                        : "text-gray-800 hover:bg-white/50"
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
               <div className="flex flex-col gap-2 mt-4">
                 {user ? (
                   <>
                     <div className="flex items-center gap-2 px-3 py-2 bg-white/70 rounded-lg">
                       <User className="w-4 h-4 text-gray-700" />
                       <span className="text-sm font-medium text-gray-900">
-                        {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                        {displayName}
                       </span>
                     </div>
+                    <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start gap-2 text-gray-800 hover:bg-white/50"
+                      >
+                        <User className="w-4 h-4" />
+                        Profile
+                      </Button>
+                    </Link>
                     <Button 
                       variant="ghost" 
                       onClick={handleSignOut}

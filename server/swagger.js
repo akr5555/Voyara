@@ -76,7 +76,7 @@ const options = {
           properties: {
             id: {
               type: 'string',
-              description: 'Destination ID'
+              description: 'Destination ID (UUID)'
             },
             name: {
               type: 'string',
@@ -94,9 +94,18 @@ const options = {
               type: 'string',
               description: 'Image URL'
             },
-            rating: {
+            latitude: {
               type: 'number',
-              description: 'Rating (0-5)'
+              description: 'Latitude coordinate'
+            },
+            longitude: {
+              type: 'number',
+              description: 'Longitude coordinate'
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Creation timestamp'
             }
           }
         },
@@ -105,15 +114,19 @@ const options = {
           properties: {
             id: {
               type: 'string',
-              description: 'Trip ID'
+              description: 'Trip ID (UUID)'
             },
-            title: {
+            userId: {
               type: 'string',
-              description: 'Trip title'
+              description: 'User ID who created the trip'
             },
-            destination: {
+            name: {
               type: 'string',
-              description: 'Destination name'
+              description: 'Trip name'
+            },
+            description: {
+              type: 'string',
+              description: 'Trip description'
             },
             startDate: {
               type: 'string',
@@ -125,13 +138,131 @@ const options = {
               format: 'date',
               description: 'Trip end date'
             },
-            price: {
-              type: 'number',
-              description: 'Trip price'
+            coverPhoto: {
+              type: 'string',
+              description: 'Cover photo URL'
             },
-            availableSeats: {
+            budget: {
               type: 'number',
-              description: 'Available seats'
+              description: 'Trip budget'
+            },
+            status: {
+              type: 'string',
+              enum: ['planning', 'ongoing', 'completed', 'cancelled'],
+              description: 'Trip status'
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Creation timestamp'
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Last update timestamp'
+            }
+          }
+        },
+        UserProfile: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'User ID (same as auth user)'
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'User email'
+            },
+            fullName: {
+              type: 'string',
+              description: 'User full name'
+            },
+            avatarUrl: {
+              type: 'string',
+              description: 'Avatar image URL'
+            },
+            bio: {
+              type: 'string',
+              description: 'User bio'
+            },
+            language: {
+              type: 'string',
+              description: 'Preferred language (ISO 639-1)'
+            },
+            preferences: {
+              type: 'object',
+              description: 'User preferences (JSON)'
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Account creation date'
+            },
+            updatedAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Last update date'
+            }
+          }
+        },
+        SavedDestination: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'Saved destination ID'
+            },
+            userId: {
+              type: 'string',
+              description: 'User ID'
+            },
+            destinationId: {
+              type: 'string',
+              description: 'Destination ID'
+            },
+            notes: {
+              type: 'string',
+              description: 'User notes about the destination'
+            },
+            savedAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'When the destination was saved'
+            },
+            destinations: {
+              $ref: '#/components/schemas/Destination'
+            }
+          }
+        },
+        TripDestination: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              description: 'Trip destination ID'
+            },
+            tripId: {
+              type: 'string',
+              description: 'Trip ID'
+            },
+            destinationId: {
+              type: 'string',
+              description: 'Destination ID'
+            },
+            visitOrder: {
+              type: 'integer',
+              description: 'Order of visit in the trip'
+            },
+            notes: {
+              type: 'string',
+              description: 'Notes for this destination in the trip'
+            },
+            createdAt: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Creation timestamp'
             }
           }
         },
