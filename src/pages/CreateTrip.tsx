@@ -114,42 +114,61 @@ const CreateTrip = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated Background Patterns */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-400/15 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div className="absolute top-1/3 left-1/3 w-80 h-80 bg-purple-400/10 rounded-full blur-2xl animate-pulse delay-300"></div>
+      </div>
+
       <Header />
       
-      <div className="container mx-auto px-4 py-8 mt-20">
+      <div className="container mx-auto px-4 py-8 mt-20 relative z-10">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl font-bold mb-8 text-foreground">Create New Trip</h1>
+          <div className="text-center mb-12">
+            <h1 className="font-display text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Create New Trip
+            </h1>
+            <p className="text-slate-600 text-lg font-medium">Plan your next unforgettable adventure</p>
+          </div>
 
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MapPin className="w-5 h-5" />
+          <Card className="bg-white shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"></div>
+            <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100 pb-8">
+              <CardTitle className="flex items-center gap-3 text-3xl text-slate-800">
+                <div className="p-3 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
+                  <MapPin className="w-7 h-7 text-white" />
+                </div>
                 Trip Details
               </CardTitle>
-              <CardDescription>Plan your next adventure</CardDescription>
+              <CardDescription className="text-base mt-2 text-slate-600">Every journey begins with a single step... let's plan yours!</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Trip Name */}
               <div className="space-y-2">
-                <Label htmlFor="name">Trip Name *</Label>
+                <Label htmlFor="name" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                  Trip Name <span className="text-indigo-600">*</span>
+                </Label>
                 <Input
                   id="name"
                   placeholder="e.g., Summer Europe Tour"
                   value={tripData.name}
                   onChange={(e) => setTripData({ ...tripData, name: e.target.value })}
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-lg bg-white text-slate-900"
                 />
               </div>
 
               {/* Description */}
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-sm font-semibold text-slate-700">Description</Label>
                 <Textarea
                   id="description"
                   placeholder="Tell us about your trip plans..."
                   value={tripData.description}
                   onChange={(e) => setTripData({ ...tripData, description: e.target.value })}
                   rows={4}
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
                 />
               </div>
 
@@ -157,14 +176,14 @@ const CreateTrip = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Start Date */}
                 <div className="space-y-2">
-                  <Label>Start Date *</Label>
+                  <Label className="text-sm font-semibold text-slate-700">Start Date <span className="text-indigo-600">*</span></Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !tripData.start_date && "text-muted-foreground"
+                          "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-400 text-slate-900",
+                          !tripData.start_date && "text-slate-500"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -184,14 +203,14 @@ const CreateTrip = () => {
 
                 {/* End Date */}
                 <div className="space-y-2">
-                  <Label>End Date *</Label>
+                  <Label className="text-sm font-semibold text-slate-700">End Date <span className="text-indigo-600">*</span></Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !tripData.end_date && "text-muted-foreground"
+                          "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-400 text-slate-900",
+                          !tripData.end_date && "text-slate-500"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -213,19 +232,20 @@ const CreateTrip = () => {
 
               {/* Cover Image URL */}
               <div className="space-y-2">
-                <Label htmlFor="cover_image_url">Cover Image URL</Label>
+                <Label htmlFor="cover_image_url" className="text-sm font-semibold text-slate-700">Cover Image URL</Label>
                 <Input
                   id="cover_image_url"
                   placeholder="https://example.com/image.jpg"
                   value={tripData.cover_image_url}
                   onChange={(e) => setTripData({ ...tripData, cover_image_url: e.target.value })}
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
                 />
                 {tripData.cover_image_url && (
-                  <div className="mt-2 rounded-lg overflow-hidden border">
+                  <div className="mt-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl ring-4 ring-blue-500/20">
                     <img
                       src={tripData.cover_image_url}
                       alt="Cover preview"
-                      className="w-full h-48 object-cover"
+                      className="w-full h-64 object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/placeholder.svg';
                       }}
@@ -235,28 +255,28 @@ const CreateTrip = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-4 pt-6">
                 <Button
                   variant="outline"
                   onClick={() => navigate('/my-trips')}
-                  className="flex-1"
+                  className="flex-1 border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleCreateTrip}
                   disabled={creating}
-                  className="flex-1"
+                  className="flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg"
                   size="lg"
                 >
                   {creating ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating...
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Creating Your Adventure...
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4 mr-2" />
+                      <Save className="w-5 h-5 mr-2" />
                       Create Trip
                     </>
                   )}

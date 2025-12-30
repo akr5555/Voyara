@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -38,11 +38,7 @@ const MyTrips = () => {
   const [loading, setLoading] = useState(true);
   const [trips, setTrips] = useState<Trip[]>([]);
 
-  useEffect(() => {
-    fetchTrips();
-  }, []);
-
-  const fetchTrips = async () => {
+  const fetchTrips = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -74,7 +70,11 @@ const MyTrips = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate, toast]);
+
+  useEffect(() => {
+    fetchTrips();
+  }, [fetchTrips]);
 
   const handleDeleteTrip = async (tripId: string) => {
     try {
@@ -105,15 +105,15 @@ const MyTrips = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'planning':
-        return 'bg-blue-500';
+        return 'bg-gradient-to-r from-blue-500 to-blue-600';
       case 'upcoming':
-        return 'bg-yellow-500';
+        return 'bg-gradient-to-r from-yellow-500 to-orange-500';
       case 'ongoing':
-        return 'bg-green-500';
+        return 'bg-gradient-to-r from-green-500 to-emerald-600';
       case 'completed':
-        return 'bg-gray-500';
+        return 'bg-gradient-to-r from-gray-500 to-gray-600';
       default:
-        return 'bg-gray-500';
+        return 'bg-gradient-to-r from-gray-400 to-gray-500';
     }
   };
 
@@ -126,26 +126,48 @@ const MyTrips = () => {
   }
 
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-80 h-80 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 right-1/4 w-72 h-72 bg-purple-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
+      </div>
+
       <Header />
       
-      <div className="container mx-auto px-4 py-8 mt-20">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="font-display text-4xl font-bold text-foreground">My Trips</h1>
-          <Button onClick={() => navigate('/create-trip')} size="lg">
-            <Plus className="w-4 h-4 mr-2" />
+      <div className="container mx-auto px-4 py-8 mt-20 relative z-10">
+        <div className="flex items-center justify-between mb-12">
+          <div>
+            <h1 className="font-display text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+              My Trips
+            </h1>
+            <p className="text-slate-600 text-lg font-medium">Your adventures await!</p>
+          </div>
+          <Button 
+            onClick={() => navigate('/create-trip')} 
+            size="lg"
+            className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-105 transition-all duration-200 text-white font-semibold shadow-lg"
+          >
+            <Plus className="w-5 h-5 mr-2" />
             Create New Trip
           </Button>
         </div>
 
         {trips.length === 0 ? (
-          <Card className="bg-card">
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <MapPin className="w-16 h-16 text-muted-foreground mb-4" />
-              <h3 className="text-2xl font-semibold mb-2">No trips yet</h3>
-              <p className="text-muted-foreground mb-6">Start planning your next adventure!</p>
-              <Button onClick={() => navigate('/create-trip')}>
-                <Plus className="w-4 h-4 mr-2" />
+          <Card className="bg-white shadow-2xl border border-slate-200">
+            <CardContent className="flex flex-col items-center justify-center py-20">
+              <div className="p-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full mb-6">
+                <MapPin className="w-20 h-20 text-indigo-600" />
+              </div>
+              <h3 className="text-3xl font-bold mb-3 text-slate-800">No trips yet</h3>
+              <p className="text-slate-600 mb-8 text-lg">Start planning your next adventure!</p>
+              <Button 
+                onClick={() => navigate('/create-trip')}
+                className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-xl transform hover:scale-105 transition-all text-white font-semibold shadow-lg"
+                size="lg"
+              >
+                <Plus className="w-5 h-5 mr-2" />
                 Create Your First Trip
               </Button>
             </CardContent>
@@ -153,46 +175,52 @@ const MyTrips = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {trips.map((trip) => (
-              <Card key={trip.id} className="overflow-hidden bg-card hover:shadow-lg transition-shadow">
+              <Card key={trip.id} className="group overflow-hidden bg-white hover:shadow-2xl transition-all duration-300 border border-slate-200 transform hover:scale-[1.02]">
                 {/* Cover Image */}
-                <div className="relative h-48 bg-gradient-to-br from-primary/20 to-primary/5">
+                <div className="relative h-56 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden">
                   {trip.cover_image_url ? (
                     <img
                       src={trip.cover_image_url}
                       alt={trip.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/placeholder.svg';
                       }}
                     />
                   ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <MapPin className="w-12 h-12 text-primary/40" />
+                    <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-100 to-indigo-100">
+                      <MapPin className="w-16 h-16 text-indigo-400" />
                     </div>
                   )}
-                  <Badge className={`absolute top-4 right-4 ${getStatusColor(trip.status)}`}>
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Badge className={`absolute top-4 right-4 ${getStatusColor(trip.status)} text-white border-0 shadow-lg px-3 py-1 font-semibold`}>
                     {trip.status}
                   </Badge>
                 </div>
 
-                <CardHeader>
-                  <CardTitle className="line-clamp-1">{trip.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">
+                <CardHeader className="bg-gradient-to-br from-white to-blue-50/50 border-b border-slate-100">
+                  <CardTitle className="line-clamp-1 text-xl text-slate-800 group-hover:text-indigo-600 transition-colors">{trip.name}</CardTitle>
+                  <CardDescription className="line-clamp-2 text-base text-slate-600">
                     {trip.description || 'No description'}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="w-4 h-4" />
-                    <span>
+                <CardContent className="pt-4">
+                  <div className="flex items-center gap-2 text-sm text-slate-700 bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-100">
+                    <Calendar className="w-4 h-4 text-indigo-600" />
+                    <span className="font-medium">
                       {format(new Date(trip.start_date), 'MMM d, yyyy')} - {format(new Date(trip.end_date), 'MMM d, yyyy')}
                     </span>
                   </div>
                 </CardContent>
 
-                <CardFooter className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1">
+                <CardFooter className="flex gap-2 bg-gradient-to-br from-slate-50 to-white border-t border-slate-100">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all"
+                  >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Button>

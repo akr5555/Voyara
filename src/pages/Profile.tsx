@@ -172,53 +172,75 @@ const Profile = () => {
     : user?.email?.charAt(0).toUpperCase() || 'U';
 
   return (
-    <div className="min-h-screen bg-secondary/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-indigo-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-400/10 rounded-full blur-2xl animate-pulse delay-500"></div>
+      </div>
+
       <Header />
       
-      <div className="container mx-auto px-4 py-8 mt-20">
+      <div className="container mx-auto px-4 py-8 mt-20 relative z-10">
         <div className="max-w-3xl mx-auto">
-          <h1 className="font-display text-4xl font-bold mb-8 text-foreground">Profile Settings</h1>
+          {/* Header with Gradient Text */}
+          <div className="text-center mb-12">
+            <h1 className="font-display text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Profile Settings
+            </h1>
+            <p className="text-slate-600 text-lg font-medium">Customize your travel experience</p>
+          </div>
 
           {/* Profile Card */}
-          <Card className="mb-6 bg-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="w-5 h-5" />
+          <Card className="mb-6 bg-white shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"></div>
+            <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100">
+              <CardTitle className="flex items-center gap-3 text-2xl text-slate-800">
+                <div className="p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
+                  <User className="w-6 h-6 text-white" />
+                </div>
                 Personal Information
               </CardTitle>
-              <CardDescription>Update your profile details</CardDescription>
+              <CardDescription className="text-base text-slate-600">Update your profile details and make your mark</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Avatar Section */}
-              <div className="flex items-center gap-6">
-                <Avatar className="w-24 h-24">
-                  <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
-                  <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
+              <div className="flex items-center gap-6 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                <div className="relative group">
+                  <Avatar className="w-28 h-28 border-4 border-white shadow-xl ring-4 ring-blue-500/20">
+                    <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
+                    <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-blue-600 text-white text-3xl font-bold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Camera className="w-8 h-8 text-white" />
+                  </div>
+                </div>
                 <div className="flex-1">
-                  <Label htmlFor="avatar_url">Avatar URL</Label>
+                  <Label htmlFor="avatar_url" className="text-sm font-semibold text-slate-700">Avatar URL</Label>
                   <div className="flex gap-2 mt-2">
                     <Input
                       id="avatar_url"
                       placeholder="https://example.com/avatar.jpg"
                       value={profile.avatar_url}
                       onChange={(e) => setProfile({ ...profile, avatar_url: e.target.value })}
+                      className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
                     />
-                    <Button variant="outline" size="icon">
+                    <Button variant="outline" size="icon" className="border-indigo-300 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all">
                       <Camera className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
               </div>
 
-              <Separator />
+              <Separator className="bg-slate-200" />
 
               {/* Email (Read-only) */}
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
+                <Label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  <Mail className="w-4 h-4 text-slate-600" />
                   Email
                 </Label>
                 <Input
@@ -226,42 +248,44 @@ const Profile = () => {
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="bg-secondary/50"
+                  className="bg-slate-100 border-slate-300 text-slate-700"
                 />
-                <p className="text-sm text-muted-foreground">Email cannot be changed</p>
+                <p className="text-sm text-slate-500">Email cannot be changed</p>
               </div>
 
               {/* Full Name */}
               <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
+                <Label htmlFor="full_name" className="text-sm font-semibold text-slate-700">Full Name</Label>
                 <Input
                   id="full_name"
                   placeholder="John Doe"
                   value={profile.full_name}
                   onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
                 />
               </div>
 
               {/* Bio */}
               <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
+                <Label htmlFor="bio" className="text-sm font-semibold text-slate-700">Bio</Label>
                 <Textarea
                   id="bio"
                   placeholder="Tell us about yourself..."
                   value={profile.bio}
                   onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                   rows={4}
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
                 />
               </div>
 
               {/* Language Preference */}
               <div className="space-y-2">
-                <Label htmlFor="language">Preferred Language</Label>
+                <Label htmlFor="language" className="text-sm font-semibold text-slate-700">Preferred Language</Label>
                 <select
                   id="language"
                   value={profile.language}
                   onChange={(e) => setProfile({ ...profile, language: e.target.value })}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 py-2"
+                  className="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none"
                 >
                   <option value="en">English</option>
                   <option value="es">Español</option>
@@ -276,17 +300,17 @@ const Profile = () => {
               <Button
                 onClick={handleSave}
                 disabled={saving}
-                className="w-full"
+                className="w-full bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg"
                 size="lg"
               >
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Saving...
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Saving Your Changes...
                   </>
                 ) : (
                   <>
-                    <Save className="w-4 h-4 mr-2" />
+                    <Save className="w-5 h-5 mr-2" />
                     Save Changes
                   </>
                 )}
@@ -295,15 +319,16 @@ const Profile = () => {
           </Card>
 
           {/* Account Actions */}
-          <Card className="bg-card">
-            <CardHeader>
-              <CardTitle>Account Actions</CardTitle>
-              <CardDescription>Manage your account</CardDescription>
+          <Card className="bg-white shadow-2xl border border-slate-200 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900"></div>
+            <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100">
+              <CardTitle className="text-xl text-slate-800">Account Actions</CardTitle>
+              <CardDescription className="text-slate-600">Manage your account settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Button
                 variant="outline"
-                className="w-full justify-start"
+                className="w-full justify-start border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all"
                 onClick={handleLogout}
               >
                 <LogOut className="w-4 h-4 mr-2" />
@@ -312,7 +337,7 @@ const Profile = () => {
 
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all">
                     <Trash2 className="w-4 h-4 mr-2" />
                     Delete Account
                   </Button>
