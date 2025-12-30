@@ -134,27 +134,27 @@ const CreateTrip = () => {
 
       <Header />
       
-      <div className="container mx-auto px-4 py-8 mt-20 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 mt-16 sm:mt-20 relative z-10">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="font-display text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent px-2">
               Create New Trip
             </h1>
-            <p className="text-slate-600 text-lg font-medium">Plan your next unforgettable adventure</p>
+            <p className="text-slate-600 text-base sm:text-lg font-medium px-4">Plan your next unforgettable adventure</p>
           </div>
 
           <Card className="bg-white shadow-2xl border border-slate-200 overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"></div>
-            <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100 pb-8">
-              <CardTitle className="flex items-center gap-3 text-3xl text-slate-800">
-                <div className="p-3 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
-                  <MapPin className="w-7 h-7 text-white" />
+            <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100 px-4 sm:px-6 py-4 sm:py-6 pb-6 sm:pb-8">
+              <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl md:text-3xl text-slate-800">
+                <div className="p-2 sm:p-3 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
+                  <MapPin className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-white" />
                 </div>
                 Trip Details
               </CardTitle>
-              <CardDescription className="text-base mt-2 text-slate-600">Every journey begins with a single step... let's plan yours!</CardDescription>
+              <CardDescription className="text-sm sm:text-base mt-2 text-slate-600">Every journey begins with a single step... let's plan yours!</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 sm:py-6">
               {/* Trip Name */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-semibold text-slate-700 flex items-center gap-2">
@@ -165,7 +165,7 @@ const CreateTrip = () => {
                   placeholder="e.g., Summer Europe Tour"
                   value={tripData.name}
                   onChange={(e) => setTripData({ ...tripData, name: e.target.value })}
-                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-lg bg-white text-slate-900"
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 text-base sm:text-lg bg-white text-slate-900"
                 />
               </div>
 
@@ -178,7 +178,7 @@ const CreateTrip = () => {
                   value={tripData.description}
                   onChange={(e) => setTripData({ ...tripData, description: e.target.value })}
                   rows={4}
-                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base resize-none"
                 />
               </div>
 
@@ -192,15 +192,15 @@ const CreateTrip = () => {
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-400 text-slate-900",
+                          "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-400 text-slate-900 h-10 sm:h-11 text-sm sm:text-base",
                           !tripData.start_date && "text-slate-500"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {tripData.start_date ? format(tripData.start_date, "PPP") : "Pick a date"}
+                        <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{tripData.start_date ? format(tripData.start_date, "PPP") : "Pick a date"}</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
                         selected={tripData.start_date}
@@ -219,15 +219,15 @@ const CreateTrip = () => {
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-400 text-slate-900",
+                          "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-400 text-slate-900 h-10 sm:h-11 text-sm sm:text-base",
                           !tripData.end_date && "text-slate-500"
                         )}
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {tripData.end_date ? format(tripData.end_date, "PPP") : "Pick a date"}
+                        <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{tripData.end_date ? format(tripData.end_date, "PPP") : "Pick a date"}</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent className="w-auto p-0" align="start">
                       <Calendar
                         mode="single"
                         selected={tripData.end_date}
@@ -248,14 +248,14 @@ const CreateTrip = () => {
                   placeholder="https://example.com/image.jpg"
                   value={tripData.cover_image_url}
                   onChange={(e) => setTripData({ ...tripData, cover_image_url: e.target.value })}
-                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900"
+                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base"
                 />
                 {tripData.cover_image_url && (
-                  <div className="mt-4 rounded-2xl overflow-hidden border-4 border-white shadow-2xl ring-4 ring-blue-500/20">
+                  <div className="mt-4 rounded-xl sm:rounded-2xl overflow-hidden border-2 sm:border-4 border-white shadow-xl sm:shadow-2xl ring-2 sm:ring-4 ring-blue-500/20">
                     <img
                       src={tripData.cover_image_url}
                       alt="Cover preview"
-                      className="w-full h-64 object-cover"
+                      className="w-full h-48 sm:h-64 object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/placeholder.svg';
                       }}
@@ -265,28 +265,29 @@ const CreateTrip = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex gap-4 pt-6">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-6">
                 <Button
                   variant="outline"
                   onClick={() => navigate('/my-trips')}
-                  className="flex-1 border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all"
+                  className="w-full sm:flex-1 border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all h-10 sm:h-11 text-sm sm:text-base"
                 >
                   Cancel
                 </Button>
                 <Button
                   onClick={handleCreateTrip}
                   disabled={creating}
-                  className="flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg"
+                  className="w-full sm:flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg h-10 sm:h-11 text-sm sm:text-base"
                   size="lg"
                 >
                   {creating ? (
                     <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Creating Your Adventure...
+                      <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Creating Your Adventure...</span>
+                      <span className="sm:hidden">Creating...</span>
                     </>
                   ) : (
                     <>
-                      <Save className="w-5 h-5 mr-2" />
+                      <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                       Create Trip
                     </>
                   )}

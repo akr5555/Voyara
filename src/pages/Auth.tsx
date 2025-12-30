@@ -158,46 +158,49 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4 py-8 relative">
+    <div className="min-h-screen bg-secondary/30 flex items-center justify-center px-4 py-8 sm:py-12 relative">
       {/* Back to Home Button - Top Left */}
       <Link 
         to="/" 
-        className="absolute top-6 left-6 group"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 group z-50"
       >
         <Button 
           variant="outline" 
-          className="flex items-center gap-2 bg-white/90 hover:bg-white border-2 border-slate-200 hover:border-indigo-400 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-6 py-2 h-auto"
+          className="flex items-center gap-1.5 sm:gap-2 bg-white/90 hover:bg-white border-2 border-slate-200 hover:border-indigo-400 shadow-lg hover:shadow-xl transition-all duration-300 rounded-full px-3 sm:px-6 py-1.5 sm:py-2 h-auto text-xs sm:text-sm"
         >
-          <ArrowLeft className="w-4 h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
-          <Home className="w-4 h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
-          <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors">
-            
+          <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
+          <Home className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
+          <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors hidden sm:inline">
+            Back to Home
+          </span>
+          <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors sm:hidden">
+            Home
           </span>
         </Button>
       </Link>
 
       <div className="w-full max-w-md">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6 sm:mb-8">
           <Link to="/" className="inline-block">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4 hover:scale-110 transition-transform duration-300">
-              <Plane className="w-8 h-8 text-primary-foreground" />
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 hover:scale-110 transition-transform duration-300">
+              <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
             </div>
           </Link>
-          <h1 className="font-display text-3xl font-bold text-foreground">
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
             {isLogin ? "VOYARA" : "Create Account"}
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base">
             {isLogin ? "Plan your perfect journey" : "Join VOYARA today"}
           </p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-card rounded-2xl shadow-lg p-6 sm:p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="bg-card rounded-xl sm:rounded-2xl shadow-lg p-4 sm:p-6 md:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="text-foreground font-medium">
+                <Label htmlFor="fullName" className="text-foreground font-medium text-sm">
                   Full Name
                 </Label>
                 <Input
@@ -207,7 +210,7 @@ const Auth = () => {
                   placeholder="John Doe"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className="h-12 bg-secondary/50 border-border/50 focus:border-primary"
+                  className="h-10 sm:h-12 bg-secondary/50 border-border/50 focus:border-primary text-sm sm:text-base"
                   required
                   disabled={isLoading}
                 />
@@ -215,7 +218,7 @@ const Auth = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground font-medium">
+              <Label htmlFor="email" className="text-foreground font-medium text-sm">
                 Email
               </Label>
               <Input
@@ -225,14 +228,14 @@ const Auth = () => {
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="h-12 bg-secondary/50 border-border/50 focus:border-primary"
+                className="h-10 sm:h-12 bg-secondary/50 border-border/50 focus:border-primary text-sm sm:text-base"
                 required
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground font-medium">
+              <Label htmlFor="password" className="text-foreground font-medium text-sm">
                 Password
               </Label>
               <Input
@@ -242,7 +245,7 @@ const Auth = () => {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="h-12 bg-secondary/50 border-border/50 focus:border-primary"
+                className="h-10 sm:h-12 bg-secondary/50 border-border/50 focus:border-primary text-sm sm:text-base"
                 required
                 disabled={isLoading}
               />
@@ -253,7 +256,7 @@ const Auth = () => {
 
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground font-medium">
+                <Label htmlFor="confirmPassword" className="text-foreground font-medium text-sm">
                   Confirm Password
                 </Label>
                 <Input
@@ -263,7 +266,7 @@ const Auth = () => {
                   placeholder="••••••••"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className="h-12 bg-secondary/50 border-border/50 focus:border-primary"
+                  className="h-10 sm:h-12 bg-secondary/50 border-border/50 focus:border-primary text-sm sm:text-base"
                   required
                   disabled={isLoading}
                 />
@@ -274,20 +277,20 @@ const Auth = () => {
               <div className="text-right">
                 <button
                   type="button"
-                  className="text-sm text-primary hover:underline"
+                  className="text-xs sm:text-sm text-primary hover:underline"
                 >
                   Forgot password?
                 </button>
               </div>
             )}
 
-            <div className="flex gap-3">
-              <Link to="/" className="flex-1">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 pt-2">
+              <Link to="/" className="w-full sm:flex-1">
                 <Button
                   type="button"
                   variant="outline"
                   disabled={isLoading}
-                  className="w-full h-12 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-base transition-all"
+                  className="w-full h-10 sm:h-12 border-2 border-slate-300 hover:border-slate-400 hover:bg-slate-50 text-slate-700 font-semibold rounded-xl text-sm sm:text-base transition-all"
                 >
                   Cancel
                 </Button>
@@ -295,15 +298,15 @@ const Auth = () => {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl text-base shadow-lg hover:shadow-xl transition-all"
+                className="w-full sm:flex-1 h-10 sm:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl text-sm sm:text-base shadow-lg hover:shadow-xl transition-all"
               >
                 {isLoading ? "Please wait..." : isLogin ? "Login" : "Create Account"}
               </Button>
             </div>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-muted-foreground">
+          <div className="mt-5 sm:mt-6 text-center">
+            <p className="text-muted-foreground text-sm sm:text-base">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button
                 type="button"

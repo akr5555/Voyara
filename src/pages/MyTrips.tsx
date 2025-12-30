@@ -146,48 +146,49 @@ const MyTrips = () => {
 
       <Header />
       
-      <div className="container mx-auto px-4 py-8 mt-20 relative z-10">
-        <div className="flex items-center justify-between mb-12">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 mt-16 sm:mt-20 relative z-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0 mb-8 sm:mb-12">
           <div>
-            <h1 className="font-display text-5xl md:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent mb-1 sm:mb-2">
               My Trips
             </h1>
-            <p className="text-slate-600 text-lg font-medium">Your adventures await!</p>
+            <p className="text-slate-600 text-base sm:text-lg font-medium">Your adventures await!</p>
           </div>
           <Button 
             onClick={() => navigate('/create-trip')} 
             size="lg"
-            className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-105 transition-all duration-200 text-white font-semibold shadow-lg"
+            className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-105 transition-all duration-200 text-white font-semibold shadow-lg h-11 sm:h-12 text-sm sm:text-base"
           >
-            <Plus className="w-5 h-5 mr-2" />
-            Create New Trip
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            <span className="hidden sm:inline">Create New Trip</span>
+            <span className="sm:hidden">New Trip</span>
           </Button>
         </div>
 
         {trips.length === 0 ? (
           <Card className="bg-white shadow-2xl border border-slate-200">
-            <CardContent className="flex flex-col items-center justify-center py-20">
-              <div className="p-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full mb-6">
-                <MapPin className="w-20 h-20 text-indigo-600" />
+            <CardContent className="flex flex-col items-center justify-center py-12 sm:py-20 px-4">
+              <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full mb-4 sm:mb-6">
+                <MapPin className="w-12 h-12 sm:w-20 sm:h-20 text-indigo-600" />
               </div>
-              <h3 className="text-3xl font-bold mb-3 text-slate-800">No trips yet</h3>
-              <p className="text-slate-600 mb-8 text-lg">Start planning your next adventure!</p>
+              <h3 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-slate-800 text-center">No trips yet</h3>
+              <p className="text-slate-600 mb-6 sm:mb-8 text-base sm:text-lg text-center px-4">Start planning your next adventure!</p>
               <Button 
                 onClick={() => navigate('/create-trip')}
-                className="bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-xl transform hover:scale-105 transition-all text-white font-semibold shadow-lg"
+                className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-xl transform hover:scale-105 transition-all text-white font-semibold shadow-lg h-11 sm:h-12 text-sm sm:text-base"
                 size="lg"
               >
-                <Plus className="w-5 h-5 mr-2" />
+                <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                 Create Your First Trip
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {trips.map((trip) => (
               <Card key={trip.id} className="group overflow-hidden bg-white hover:shadow-2xl transition-all duration-300 border border-slate-200 transform hover:scale-[1.02]">
                 {/* Cover Image */}
-                <div className="relative h-56 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden">
+                <div className="relative h-48 sm:h-56 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden">
                   {trip.cover_image_url ? (
                     <img
                       src={trip.cover_image_url}
@@ -199,56 +200,56 @@ const MyTrips = () => {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full bg-gradient-to-br from-blue-100 to-indigo-100">
-                      <MapPin className="w-16 h-16 text-indigo-400" />
+                      <MapPin className="w-12 h-12 sm:w-16 sm:h-16 text-indigo-400" />
                     </div>
                   )}
                   {/* Overlay Gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <Badge className={`absolute top-4 right-4 ${getStatusColor(trip.status)} text-white border-0 shadow-lg px-3 py-1 font-semibold`}>
+                  <Badge className={`absolute top-3 right-3 sm:top-4 sm:right-4 ${getStatusColor(trip.status)} text-white border-0 shadow-lg px-2 sm:px-3 py-0.5 sm:py-1 font-semibold text-xs sm:text-sm`}>
                     {trip.status}
                   </Badge>
                 </div>
 
-                <CardHeader className="bg-gradient-to-br from-white to-blue-50/50 border-b border-slate-100">
-                  <CardTitle className="line-clamp-1 text-xl text-slate-800 group-hover:text-indigo-600 transition-colors">{trip.name}</CardTitle>
-                  <CardDescription className="line-clamp-2 text-base text-slate-600">
+                <CardHeader className="bg-gradient-to-br from-white to-blue-50/50 border-b border-slate-100 px-4 sm:px-6 py-3 sm:py-4">
+                  <CardTitle className="line-clamp-1 text-lg sm:text-xl text-slate-800 group-hover:text-indigo-600 transition-colors">{trip.name}</CardTitle>
+                  <CardDescription className="line-clamp-2 text-sm sm:text-base text-slate-600">
                     {trip.description || 'No description'}
                   </CardDescription>
                 </CardHeader>
 
-                <CardContent className="pt-4">
-                  <div className="flex items-center gap-2 text-sm text-slate-700 bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-100">
-                    <Calendar className="w-4 h-4 text-indigo-600" />
-                    <span className="font-medium">
+                <CardContent className="pt-3 sm:pt-4 px-4 sm:px-6 pb-3 sm:pb-4">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 bg-blue-50/50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-blue-100">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-600 flex-shrink-0" />
+                    <span className="font-medium truncate">
                       {format(new Date(trip.start_date), 'MMM d, yyyy')} - {format(new Date(trip.end_date), 'MMM d, yyyy')}
                     </span>
                   </div>
                 </CardContent>
 
-                <CardFooter className="flex gap-2 bg-gradient-to-br from-slate-50 to-white border-t border-slate-100">
+                <CardFooter className="flex gap-2 bg-gradient-to-br from-slate-50 to-white border-t border-slate-100 px-4 sm:px-6 py-3 sm:py-4">
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="flex-1 border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all"
+                    className="flex-1 border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all text-xs sm:text-sm h-8 sm:h-9"
                   >
-                    <Edit className="w-4 h-4 mr-2" />
+                    <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Edit
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="w-4 h-4" />
+                      <Button variant="destructive" size="sm" className="h-8 sm:h-9 px-2 sm:px-3">
+                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="max-w-[90vw] sm:max-w-lg">
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Trip</AlertDialogTitle>
-                        <AlertDialogDescription>
+                        <AlertDialogTitle className="text-lg sm:text-xl">Delete Trip</AlertDialogTitle>
+                        <AlertDialogDescription className="text-sm sm:text-base">
                           Are you sure you want to delete "{trip.name}"? This action cannot be undone.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+                        <AlertDialogCancel className="mt-0">Cancel</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => handleDeleteTrip(trip.id)}
                           className="bg-destructive"

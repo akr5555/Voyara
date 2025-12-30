@@ -20,7 +20,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer id="about" className="relative overflow-hidden pt-16 pb-8"
+    <footer id="about" className="relative overflow-hidden pt-12 sm:pt-16 pb-6 sm:pb-8"
       style={{
         background: 'linear-gradient(135deg, #E8A587 0%, #F4C4B4 50%, #E8A587 100%)',
       }}
@@ -41,40 +41,40 @@ const Footer = () => {
         />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 mb-8 sm:mb-12">
           {/* Brand Section */}
-          <div className="space-y-6">
-            <h3 className="text-3xl font-display font-bold text-gray-900">VOYARA</h3>
+          <div className="space-y-4 sm:space-y-6">
+            <h3 className="text-2xl sm:text-3xl font-display font-bold text-gray-900">VOYARA</h3>
             <p className="text-gray-700 text-sm leading-relaxed">
               Your Personal AI Assistant for unforgettable travel experiences.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4">
               <a 
                 href="#" 
-                className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 text-gray-800"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 text-gray-800"
               >
-                <Instagram className="w-5 h-5" />
+                <Instagram className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a 
                 href="#" 
-                className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 text-gray-800"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 text-gray-800"
               >
-                <Facebook className="w-5 h-5" />
+                <Facebook className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
               <a 
                 href="#" 
-                className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 text-gray-800"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 text-gray-800"
               >
-                <Twitter className="w-5 h-5" />
+                <Twitter className="w-4 h-4 sm:w-5 sm:h-5" />
               </a>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900">Quick Links</h4>
-            <ul className="space-y-3">
+          <div className="space-y-4 sm:space-y-6">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900">Quick Links</h4>
+            <ul className="space-y-2 sm:space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
                   <a 
@@ -89,9 +89,9 @@ const Footer = () => {
           </div>
 
           {/* Popular Destinations */}
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900">Top Destinations</h4>
-            <ul className="space-y-3">
+          <div className="space-y-4 sm:space-y-6">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900">Top Destinations</h4>
+            <ul className="space-y-2 sm:space-y-3">
               {destinations.map((dest) => (
                 <li key={dest}>
                   <a 
@@ -106,32 +106,32 @@ const Footer = () => {
           </div>
 
           {/* Newsletter */}
-          <div className="space-y-6">
-            <h4 className="text-lg font-semibold text-gray-900">Stay Updated</h4>
+          <div className="space-y-4 sm:space-y-6">
+            <h4 className="text-base sm:text-lg font-semibold text-gray-900">Stay Updated</h4>
             <p className="text-gray-700 text-sm">
               Subscribe for exclusive deals and travel inspiration.
             </p>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Input 
                 type="email" 
                 placeholder="Your email" 
-                className="bg-white/80 border-gray-300 text-gray-900 placeholder:text-gray-500 rounded-full"
+                className="bg-white/80 border-gray-300 text-gray-900 placeholder:text-gray-500 rounded-full text-sm"
               />
-              <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6 shadow-md">
+              <Button className="bg-gray-900 hover:bg-gray-800 text-white rounded-full px-6 shadow-md text-sm">
                 Join
               </Button>
             </div>
-            <div className="space-y-2 pt-4">
+            <div className="space-y-2 pt-2 sm:pt-4">
               <div className="flex items-center gap-3 text-gray-700 text-sm">
-                <Mail className="w-4 h-4 text-gray-900" />
-                <span>hello@voyara.travel</span>
+                <Mail className="w-4 h-4 text-gray-900 flex-shrink-0" />
+                <span className="truncate">hello@voyara.travel</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700 text-sm">
-                <Phone className="w-4 h-4 text-gray-900" />
+                <Phone className="w-4 h-4 text-gray-900 flex-shrink-0" />
                 <span>+1 (555) 123-4567</span>
               </div>
               <div className="flex items-center gap-3 text-gray-700 text-sm">
-                <MapPin className="w-4 h-4 text-gray-900" />
+                <MapPin className="w-4 h-4 text-gray-900 flex-shrink-0" />
                 <span>San Francisco, CA</span>
               </div>
             </div>
@@ -139,11 +139,11 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800/20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-gray-700 text-sm">
+        <div className="border-t border-gray-800/20 pt-6 sm:pt-8 flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4">
+          <p className="text-gray-700 text-xs sm:text-sm text-center md:text-left">
             © 2025 VOYARA. All rights reserved.
           </p>
-          <div className="flex gap-6 text-gray-700 text-sm">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 text-gray-700 text-xs sm:text-sm">
             <a href="#" className="hover:text-gray-900 hover:underline transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-gray-900 hover:underline transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-gray-900 hover:underline transition-colors">Cookie Policy</a>
