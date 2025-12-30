@@ -53,21 +53,11 @@ const Profile = () => {
       setUser(user);
 
       // Fetch user profile from database  
-      const result = await (supabase as unknown as {
-        from: (table: string) => {
-          select: (cols: string) => {
-            eq: (col: string, val: string) => {
-              single: () => Promise<{ data: UserProfile | null; error: { code?: string } | null }>
-            }
-          }
-        }
-      })
+      const { data: profileData, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
-      
-      const { data: profileData, error } = result;
+        .single() as { data: UserProfile | null; error: { code?: string } | null };
 
       if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
         console.error('Error fetching profile:', error);
@@ -115,13 +105,12 @@ const Profile = () => {
       
       console.log('💾 Attempting to save profile:', updateData);
       
-      const { error } = await (supabase as unknown as {
-        from: (table: string) => {
-          upsert: (data: typeof updateData) => Promise<{ error: Error | null }>
-        }
-      })
+      const { error } = await supabase
         .from('user_profiles')
-        .upsert(updateData);
+        .upsert(updateData as never, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        }) as { error: Error | null };
 
       if (error) {
         console.error('❌ Supabase error details:', error);
