@@ -66,7 +66,7 @@ We bridge the gap between fun planning and serious logistics. With one click, th
 
 ---
 
-## ⚙️ Architectural Flow & User Journey
+##  Architectural Flow & User Journey
 
 We have designed a robust end-to-end flow that guides the user from inspiration to actionable output.
 
