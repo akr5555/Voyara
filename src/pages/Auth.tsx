@@ -171,7 +171,6 @@ const Auth = () => {
           <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
           <Home className="w-3 h-3 sm:w-4 sm:h-4 text-slate-600 group-hover:text-indigo-600 transition-colors" />
           <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors hidden sm:inline">
-            Back to Home
           </span>
           <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors sm:hidden">
             Home
