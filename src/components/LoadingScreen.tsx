@@ -1,27 +1,40 @@
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const LoadingScreen = () => {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Animate progress bar
-    const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) return 100;
-        return prev + 2;
-      });
-    }, 20);
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // Only show loading screen if user is not logged in
+      if (!session) {
+        setIsVisible(true);
+        
+        // Animate progress bar
+        const progressInterval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 100) return 100;
+            return prev + 2;
+          });
+        }, 20);
 
-    // Hide loading screen after 1 second
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-    }, 2000);
+        // Hide loading screen after 2 seconds
+        const timer = setTimeout(() => {
+          setIsVisible(false);
+        }, 2000);
 
-    return () => {
-      clearTimeout(timer);
-      clearInterval(progressInterval);
+        return () => {
+          clearTimeout(timer);
+          clearInterval(progressInterval);
+        };
+      }
     };
+
+    checkAuth();
   }, []);
 
   if (!isVisible) return null;
