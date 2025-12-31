@@ -84,7 +84,7 @@ const Header = () => {
             <img 
               src="/logo.png" 
               alt="VOYARA" 
-              className="h-10 sm:h-12 w-auto object-contain hover:scale-105 transition-transform duration-300"
+              className="h-10 sm:h-12 w-auto object-contain rounded-xl border-2 border-white/80 shadow-md hover:scale-105 hover:border-indigo-400 hover:shadow-lg transition-all duration-300 bg-white/50 p-1"
             />
           </Link>
 
