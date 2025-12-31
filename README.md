@@ -19,14 +19,16 @@ We gamify the entire process, taking you from an initial dream to a fully struct
 
 ---
 
-## 🔗 Live Demo & Documentation
+## 🔗 Live Demo, Mobile App & Resources
 
-### 🌐 **[Click Here to Launch Voyara Live](https://voyara.onrender.com)**
+### 🌐 **[Click Here to Launch Voyara Web Live](https://voyara.onrender.com)**
 *Judges can view and test the live deployment of our platform here.*
 
-### 📂 Technical Resources
-To keep our repository clean, we have moved detailed explanations to dedicated folders:
+### 📱 **[Click Here to View Mobile App Repository](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)**
+*Explore our native mobile application built with **Kotlin Multiplatform (KMP)**.*
 
+### 📂 Technical Documentation
+To keep our repository clean, we have moved detailed explanations to dedicated folders:
 * **[📖 Documentation Folder (Docs)](./docs/)**: Contains the detailed breakdown of our architecture:
   * **[Flowchart Explanation](./docs/FLOWCHART.md)**
   * **[Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)**
