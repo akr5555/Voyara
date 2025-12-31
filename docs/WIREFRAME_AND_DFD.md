@@ -16,7 +16,7 @@ of the system.
 Login → Registration → Landing Page → Create Trip → Build Itinerary →  
 Trip Listing → Profile → Search → Itinerary View → Community → Calendar → Admin Panel
 
-![Voyara Wireframe Flow](../assets/voyara_wireframe.png)
+![Voyara Wireframe Flow](../assets/voyara_wireframe_flow.png)
 
 - Covered Features
 - Authentication (Login & Registration)
