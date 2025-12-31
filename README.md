@@ -1,6 +1,6 @@
 <div align="center">
 
-# ✈️ Voyara
+#  Voyara
 ## Your Intelligent, End-to-End Local Travel Companion
 
 > *Experience the world your way. Plan the journey, not just the bookings.*
@@ -9,7 +9,7 @@
 
 ---
 
-## 💡 The Vision: Revolutionizing Travel Planning
+##  The Vision: Revolutionizing Travel Planning
 
 Currently, travel planning is a fragmented, stressful mess of open tabs—flights here, hotels there, and generic "top 10 things to do" lists that offer no real local insight. Most platforms stop once the flight is booked.
 
@@ -19,46 +19,46 @@ We gamify the entire process, taking you from an initial dream to a fully struct
 
 ---
 
-## 🔗 Live Demo, Mobile App & Resources
+##  Live Demo, Mobile App & Resources
 
-### 🌐 **[Click Here to Launch Voyara Web Live](https://voyara.onrender.com)**
+###  **[Click Here to Launch Voyara Web Live](https://voyara.onrender.com)**
 *Judges can view and test the live deployment of our platform here.*
 
-### 📱 **[Click Here to View Mobile App Repository](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)**
+###  **[Click Here to View Mobile App Repository](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)**
 *Explore our native mobile application built with **Kotlin Multiplatform (KMP)**.*
 
-### 📂 Technical Documentation
+###  Technical Documentation
 To keep our repository clean, we have moved detailed explanations to dedicated folders:
-* **[📖 Documentation Folder (Docs)](./docs/)**: Contains the detailed breakdown of our architecture:
+* **[ Documentation Folder (Docs)](./docs/)**: Contains the detailed breakdown of our architecture:
   * **[Flowchart Explanation](./docs/FLOWCHART.md)**
   * **[Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)**
-* **[🖼️ Visual Assets](./assets/)**: Contains the high-resolution **PNG images** of all flowcharts, database schemas, and wireframes.
+* **[ Visual Assets](./assets/)**: Contains the high-resolution **PNG images** of all flowcharts, database schemas, and wireframes.
 
 ---
 
-## ✨ Key Differentiators (Why We Win)
+##  Key Differentiators (Why We Win)
 
 Voyara stands apart by solving the hardest part of travel: ***"What do I do when I get there?"***
 
-### 🗺️ 1. The Interactive "Journey Map" Timeline
+###  1. The Interactive "Journey Map" Timeline
 
 We replaced boring list views with a visually engaging, winding timeline. It intuitively visualizes your trip flow—from departure transport, through daily morning/afternoon/night activity blocks, to your return journey.
 
 **Impact:** Planning feels like an adventure, not a spreadsheet task.
 
-### 📍 2. The "Local Guide" Discovery Engine
+###  2. The "Local Guide" Discovery Engine
 
 This is our main USP. Unlike competitors offering generic tourist traps, Voyara focuses on surfacing **locally available experiences** with real-time booking capability.
 
 **Impact:** Users discover the city like a local, not just a tourist.
 
-### ⭐ 3. "Vega" – Your Context-Aware AI Assistant
+###  3. "Vega" – Your Context-Aware AI Assistant
 
 Vega is not a generic chatbot. Integrated directly into the planning flow, Vega understands your current itinerary context. Stuck on Day 3 in Tokyo? Vega suggests activities based on your previous likes, the location, and weather.
 
 **Impact:** An intelligent co-pilot that enhances every decision.
 
-### 📊 4. One-Click Actionable Budget Excel
+###  4. One-Click Actionable Budget Excel
 
 We bridge the gap between fun planning and serious logistics. With one click, the entire visual timeline—including transport costs, accommodation, and activity fees—is exported into a detailed, timestamped **Excel Budget Sheet**.
 
@@ -76,7 +76,7 @@ We have designed a robust end-to-end flow that guides the user from inspiration 
 
 ---
 
-## 🛠️ Tech Stack: Hybrid, Scalable & Intelligent
+##  Tech Stack: Hybrid, Scalable & Intelligent
 
 We utilize a modern, hybrid technology stack designed for cross-platform performance and high-concurrency AI processing.
 
@@ -90,13 +90,13 @@ We utilize a modern, hybrid technology stack designed for cross-platform perform
 
 ---
 
-## 🚀 Round 2 Roadmap: Future Innovations
+##  Round 2 Roadmap: Future Innovations
 
 In Round 1, we established the core interactive timeline and the local discovery engine. For Round 2, we plan to evolve Voyara from a planning tool into a **proactive travel ecosystem**.
 
 Here is our concrete plan for expansion, focusing on **AI-driven personalization** and **geospatial integration**:
 
-### 🤖 1. AI-Driven "Zero-Touch" Itinerary Generation
+###  1. AI-Driven "Zero-Touch" Itinerary Generation
 
 Currently, users build trips manually. In Round 2, we will upgrade **Vega AI** to generate complete, multi-day itineraries instantly based on a simple prompt.
 
@@ -104,21 +104,21 @@ Currently, users build trips manually. In Round 2, we will upgrade **Vega AI** t
 
 **Technical Approach:** This requires moving from simple suggestions to complex constraint satisfaction planning powered by LLMs.
 
-### 🗺️ 2. Geospatial Integration & Dynamic Mapping
+###  2. Geospatial Integration & Dynamic Mapping
 
 We will integrate interactive maps (e.g., Mapbox/Google Maps API) directly into the timeline view.
 
 - **Visual Routing:** Seeing the distance between scheduled daily activities to ensure realistic planning.
 - **Location-Based Suggestions:** Vega will prioritize suggestions that are geographically convenient to the user's current itinerary slots.
 
-### 🛡️ 3. The "Travel Guardian" Safety Suite
+###  3. The "Travel Guardian" Safety Suite
 
 We will add essential features for peace of mind, particularly for families and solo travelers:
 
 - **Local Emergency Integration:** Automatically fetching embassy contacts and local emergency numbers based on the destination.
 - **Itinerary Sharing with Live Updates:** Allowing family members to not just see the plan, but receive updates if the itinerary changes.
 
-### 🧠 4. Hyper-Personalization via User Knowledge Graph
+###  4. Hyper-Personalization via User Knowledge Graph
 
 We will move beyond generic recommendations by building a lightweight knowledge graph for returning users.
 
