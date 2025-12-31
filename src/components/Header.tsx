@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, LogOut, User } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -9,6 +9,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut, loading } = useAuth();
   const [profileName, setProfileName] = useState<string | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -87,13 +88,14 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
-            {navLinks.map((link) => 
-              link.isRoute ? (
+            {navLinks.map((link) => {
+              const isActive = link.isRoute && location.pathname === link.href;
+              return link.isRoute ? (
                 <Link
                   key={link.label}
                   to={link.href}
                   className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                    link.label === "Home"
+                    isActive
                       ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md"
                       : "text-slate-700 hover:bg-white/50"
                   }`}
@@ -104,20 +106,20 @@ const Header = () => {
                 <a
                   key={link.label}
                   href={link.href}
-                  className={`px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                    link.label === "Home"
-                      ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md"
-                      : "text-slate-700 hover:bg-white/50"
-                  }`}
+                  className="px-5 py-2 rounded-full text-sm font-medium transition-all duration-200 text-slate-700 hover:bg-white/50"
                 >
                   {link.label}
                 </a>
-              )
-            )}
+              );
+            })}
             {user && (
               <Link
                 to="/profile"
-                className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium text-slate-700 hover:bg-white/50 transition-all duration-200"
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  location.pathname === "/profile"
+                    ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-md"
+                    : "text-slate-700 hover:bg-white/50"
+                }`}
               >
                 <User className="w-4 h-4" />
                 <span>Profile</span>
@@ -179,13 +181,14 @@ const Header = () => {
         {isMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-white/20 pt-4 animate-fade-in">
             <nav className="flex flex-col gap-4">
-              {navLinks.map((link) => 
-                link.isRoute ? (
+              {navLinks.map((link) => {
+                const isActive = link.isRoute && location.pathname === link.href;
+                return link.isRoute ? (
                   <Link
                     key={link.label}
                     to={link.href}
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      link.label === "Home"
+                      isActive
                         ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white"
                         : "text-slate-700 hover:bg-white/50"
                     }`}
@@ -197,17 +200,13 @@ const Header = () => {
                   <a
                     key={link.label}
                     href={link.href}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      link.label === "Home"
-                        ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white"
-                        : "text-slate-700 hover:bg-white/50"
-                    }`}
+                    className="px-4 py-2 rounded-full text-sm font-medium transition-colors text-slate-700 hover:bg-white/50"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {link.label}
                   </a>
-                )
-              )}
+                );
+              })}
               <div className="flex flex-col gap-2 mt-4">
                 {user ? (
                   <>
@@ -220,7 +219,11 @@ const Header = () => {
                     <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
                       <Button 
                         variant="ghost" 
-                        className="w-full justify-start gap-2 text-slate-700 hover:bg-white/50"
+                        className={`w-full justify-start gap-2 ${
+                          location.pathname === "/profile"
+                            ? "bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700"
+                            : "text-slate-700 hover:bg-white/50"
+                        }`}
                       >
                         <User className="w-4 h-4" />
                         Profile
