@@ -18,7 +18,7 @@ Trip Listing → Profile → Search → Itinerary View → Community → Calenda
 
 ![Voyara Wireframe Flow](../assets/voyara_wireframe.png)
 
-Covered Features
+- Covered Features
 - Authentication (Login & Registration)
 - Trip creation and itinerary planning
 - Search, community, and calendar views
