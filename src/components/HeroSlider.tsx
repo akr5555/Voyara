@@ -34,6 +34,7 @@ const HeroSlider = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState(0);
   const [currentTranslate, setCurrentTranslate] = useState(0);
+  const [dragStartTime, setDragStartTime] = useState(0);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -60,6 +61,7 @@ const HeroSlider = () => {
   const handleDragStart = (clientX: number) => {
     setIsDragging(true);
     setStartPos(clientX);
+    setDragStartTime(Date.now());
     setIsAutoPlaying(false);
   };
 
@@ -74,10 +76,17 @@ const HeroSlider = () => {
     if (!isDragging) return;
     setIsDragging(false);
     
-    const threshold = 50; // Minimum drag distance to trigger slide change
-    if (currentTranslate > threshold) {
+    const dragEndTime = Date.now();
+    const dragDuration = dragEndTime - dragStartTime;
+    const velocity = Math.abs(currentTranslate) / dragDuration;
+    
+    // Lower threshold for mobile (30px) and consider velocity for faster swipes
+    const threshold = 30;
+    const velocityThreshold = 0.3; // pixels per millisecond
+    
+    if (currentTranslate > threshold || (velocity > velocityThreshold && currentTranslate > 0)) {
       prevSlide();
-    } else if (currentTranslate < -threshold) {
+    } else if (currentTranslate < -threshold || (velocity > velocityThreshold && currentTranslate < 0)) {
       nextSlide();
     }
     
@@ -106,14 +115,17 @@ const HeroSlider = () => {
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.stopPropagation();
     handleDragStart(e.touches[0].clientX);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    e.stopPropagation();
     handleDragMove(e.touches[0].clientX);
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.stopPropagation();
     handleDragEnd();
   };
 
@@ -165,10 +177,15 @@ const HeroSlider = () => {
         </div>
 
         {/* Layered Carousel Container - Fixed glitches */}
-        <div className="relative max-w-7xl mx-auto h-[280px] md:h-[360px] flex items-center justify-center">
+        <div className="relative max-w-7xl mx-auto h-[280px] md:h-[360px] flex items-center justify-center touch-pan-y">
           <div 
-            className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none" 
-            style={{ perspective: '2500px' }}
+            className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none touch-none" 
+            style={{ 
+              perspective: '2500px',
+              WebkitTouchCallout: 'none',
+              WebkitUserSelect: 'none',
+              touchAction: 'pan-y pinch-zoom'
+            }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -179,88 +196,98 @@ const HeroSlider = () => {
           >
             {/* Background layers - Left side cards - HIDDEN behind center */}
             <div 
-              className="absolute left-[2%] md:left-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-in-out z-[1]"
+              className="absolute left-[2%] md:left-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[1]"
               style={{
                 transform: 'translate3d(0, -50%, -80px) rotateY(18deg) scale(0.82)',
                 transformOrigin: 'center center',
                 opacity: 0.35,
                 filter: 'blur(2.5px)',
+                willChange: 'transform, opacity',
               }}
             >
               <img
                 src={slides[getSlideIndex(-2)].image}
                 alt={slides[getSlideIndex(-2)].alt}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent" />
             </div>
 
             <div 
-              className="absolute left-[12%] md:left-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-in-out z-[5]"
+              className="absolute left-[12%] md:left-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[5]"
               style={{
                 transform: 'translate3d(0, -50%, -40px) rotateY(10deg) scale(0.90)',
                 transformOrigin: 'center center',
                 opacity: 0.6,
                 filter: 'blur(1px)',
+                willChange: 'transform, opacity',
               }}
             >
               <img
                 src={slides[getSlideIndex(-1)].image}
                 alt={slides[getSlideIndex(-1)].alt}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
             </div>
 
             {/* Center - Main active slide - HIGHEST z-index - WIDER */}
             <div 
-              className="absolute left-1/2 top-1/2 w-[260px] md:w-[480px] h-[240px] md:h-[320px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-in-out z-[10]"
+              className="absolute left-1/2 top-1/2 w-[260px] md:w-[480px] h-[240px] md:h-[320px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[10]"
               style={{
                 transform: 'translate3d(-50%, -50%, 0) rotateY(0deg) scale(1)',
                 transformOrigin: 'center center',
                 opacity: 1,
                 filter: 'blur(0px)',
+                willChange: 'transform, opacity',
               }}
             >
               <img
                 src={slides[currentSlide].image}
                 alt={slides[currentSlide].alt}
                 className="w-full h-full object-cover"
+                loading="eager"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/5" />
             </div>
 
             {/* Background layers - Right side cards - HIDDEN behind center */}
             <div 
-              className="absolute right-[12%] md:right-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-in-out z-[5]"
+              className="absolute right-[12%] md:right-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[5]"
               style={{
                 transform: 'translate3d(0, -50%, -40px) rotateY(-10deg) scale(0.90)',
                 transformOrigin: 'center center',
                 opacity: 0.6,
                 filter: 'blur(1px)',
+                willChange: 'transform, opacity',
               }}
             >
               <img
                 src={slides[getSlideIndex(1)].image}
                 alt={slides[getSlideIndex(1)].alt}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-l from-black/30 to-transparent" />
             </div>
 
             <div 
-              className="absolute right-[2%] md:right-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-in-out z-[1]"
+              className="absolute right-[2%] md:right-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[1]"
               style={{
                 transform: 'translate3d(0, -50%, -80px) rotateY(-18deg) scale(0.82)',
                 transformOrigin: 'center center',
                 opacity: 0.35,
                 filter: 'blur(2.5px)',
+                willChange: 'transform, opacity',
               }}
             >
               <img
                 src={slides[getSlideIndex(2)].image}
                 alt={slides[getSlideIndex(2)].alt}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent" />
             </div>
