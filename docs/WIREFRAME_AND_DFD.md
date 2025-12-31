@@ -1,18 +1,15 @@
 VOYARA – Travel Planning & Itinerary Management System
 
-Voyara is a travel planning platform that helps users plan trips, build itineraries, manage budgets, explore destinations, and interact with a travel community.  
-This document describes the **UI wireframes** and **Data Flow Diagram (DFD)** of the system.
+Voyara is a travel planning platform that helps users plan trips, build itineraries, manage budgets, explore destinations, and interact with a travel community.
+
+This document describes the 
+-**UI wireframes**  
+-**Data Flow Diagram (DFD)** 
+-**Database Schema** 
+of the system.
 
 
-## Project Scope
-
--  Complete UI wireframes
--  System navigation flow
--  Data Flow Diagram (DFD – Level 1)
--  Admin analytics overview
-
-
-## UI Wireframes – Application Flow
+## 1 - UI Wireframes – Application Flow
 
 **Screen Sequence:**
 
@@ -41,7 +38,7 @@ Covered Features
 - **Admin Panel:** Analytics, reports, and insights  
 
 
-## Data Flow Diagram (DFD – Level 1)
+## 2 - Data Flow Diagram (DFD – Level 1)
 
 ![Voyara DFD](../assets/voyara_dfd.png)
 
@@ -63,6 +60,34 @@ Covered Features
 - D2 Trip & Itinerary Database  
 - D3 Activity / Location Database  
 - D4 Community Database  
+
+
+## 3 - Database Schema
+
+![Voyara Database Schema](../assets/voyara_database_schema.png)
+
+### Key Tables
+
+- **user_profiles** – Stores user profile details linked to authenticated users  
+- **trips** – Contains trip information such as dates, budget, status, and cover image  
+- **destinations** – Stores destination details including location, rating, and description  
+- **trip_destinations** – Maps destinations to trips and maintains visit order and dates  
+- **saved_destinations** – Stores destinations bookmarked by users  
+
+### Relationships
+
+- One user can create multiple trips  
+- A trip can include multiple destinations  
+- Destinations can belong to multiple trips  
+- Users can save destinations independently of trips  
+
+### Design Notes
+
+- Normalized schema for scalability  
+- Supports itinerary sequencing and budgeting  
+- Easily extensible for future features and analytics  
+
+
 
 ##  Architecture Summary
 
