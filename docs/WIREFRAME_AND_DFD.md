@@ -1,11 +1,8 @@
-VOYARA – Travel Planning & Itinerary Management System
+### VOYARA – Travel Planning & Itinerary Management System
 
 Voyara is a travel planning platform that helps users plan trips, build itineraries, manage budgets, explore destinations, and interact with a travel community.
 
-This document describes the 
--**UI wireframes**  
--**Data Flow Diagram (DFD)** 
--**Database Schema** 
+This document describes the **UI wireframes** , **Data Flow Diagram (DFD)** and **Database Schema** 
 of the system.
 
 
