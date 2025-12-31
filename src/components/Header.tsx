@@ -80,12 +80,15 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2 sm:gap-3">
             <img 
               src="/logo.png" 
               alt="VOYARA" 
               className="h-10 sm:h-12 w-auto object-contain rounded-xl border-2 border-white/80 shadow-md hover:scale-105 hover:border-indigo-400 hover:shadow-lg transition-all duration-300 bg-white/50 p-1"
             />
+            <span className="font-display text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent hover:from-indigo-600 hover:to-blue-600 transition-all duration-300">
+              VOYARA
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
