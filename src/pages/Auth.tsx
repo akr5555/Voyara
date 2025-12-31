@@ -173,7 +173,6 @@ const Auth = () => {
           <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors hidden sm:inline">
           </span>
           <span className="font-semibold text-slate-700 group-hover:text-indigo-600 transition-colors sm:hidden">
-            Home
           </span>
         </Button>
       </Link>

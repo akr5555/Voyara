@@ -3,18 +3,22 @@ import HeroSlider from "@/components/HeroSlider";
 import UpcomingTrips from "@/components/UpcomingTrips";
 import PopularDestinations from "@/components/PopularDestinations";
 import Footer from "@/components/Footer";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>
-        <HeroSlider />
-        <UpcomingTrips />
-        <PopularDestinations />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <LoadingScreen />
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main>
+          <HeroSlider />
+          <UpcomingTrips />
+          <PopularDestinations />
+        </main>
+        <Footer />
+      </div>
+    </>
   );
 };
 
