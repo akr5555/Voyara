@@ -80,11 +80,13 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <a href="#home" className="flex items-center gap-2">
-            <span className="text-2xl font-display font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
-              VOYARA
-            </span>
-          </a>
+          <Link to="/" className="flex items-center gap-2">
+            <img 
+              src="/logo.png" 
+              alt="VOYARA" 
+              className="h-10 sm:h-12 w-auto object-contain hover:scale-105 transition-transform duration-300"
+            />
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2">
