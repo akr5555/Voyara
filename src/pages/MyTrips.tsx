@@ -186,7 +186,11 @@ const MyTrips = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {trips.map((trip) => (
-              <Card key={trip.id} className="group overflow-hidden bg-white hover:shadow-2xl transition-all duration-300 border border-slate-200 transform hover:scale-[1.02]">
+              <Card 
+                key={trip.id} 
+                className="group overflow-hidden bg-white hover:shadow-2xl transition-all duration-300 border border-slate-200 transform hover:scale-[1.02] cursor-pointer"
+                onClick={() => navigate(`/my-trips/${trip.id}`)}
+              >
                 {/* Cover Image */}
                 <div className="relative h-48 sm:h-56 bg-gradient-to-br from-blue-100 to-indigo-100 overflow-hidden">
                   {trip.cover_image_url ? (
@@ -230,13 +234,17 @@ const MyTrips = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Navigate to edit page when ready
+                    }}
                     className="flex-1 border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all text-xs sm:text-sm h-8 sm:h-9"
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                     Edit
                   </Button>
                   <AlertDialog>
-                    <AlertDialogTrigger asChild>
+                    <AlertDialogTrigger asChild onClick={(e) => e.stopPropagation()}>
                       <Button variant="destructive" size="sm" className="h-8 sm:h-9 px-2 sm:px-3">
                         <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                       </Button>
