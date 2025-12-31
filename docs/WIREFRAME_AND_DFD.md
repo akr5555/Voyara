@@ -89,7 +89,7 @@ Trip Listing → Profile → Search → Itinerary View → Community → Calenda
 
 
 
-##  Architecture Summary
+## Architecture Summary
 
 - Modular and scalable system design  
 - Clear separation of system responsibilities  
