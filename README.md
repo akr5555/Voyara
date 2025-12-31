@@ -19,6 +19,21 @@ We gamify the entire process, taking you from an initial dream to a fully struct
 
 ---
 
+## 🔗 Live Demo & Documentation
+
+### 🌐 **[Click Here to Launch Voyara Live](https://voyara.onrender.com)**
+*Judges can view and test the live deployment of our platform here.*
+
+### 📂 Technical Resources
+To keep our repository clean, we have moved detailed explanations to dedicated folders:
+
+* **[📖 Documentation Folder (Docs)](./docs/)**: Contains the detailed breakdown of our architecture:
+  * **[Flowchart Explanation](./docs/FLOWCHART.md)**
+  * **[Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)**
+* **[🖼️ Visual Assets](./assets/)**: Contains the high-resolution **PNG images** of all flowcharts, database schemas, and wireframes.
+
+---
+
 ## ✨ Key Differentiators (Why We Win)
 
 Voyara stands apart by solving the hardest part of travel: ***"What do I do when I get there?"***
