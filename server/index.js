@@ -673,6 +673,51 @@ app.get('/api/trips', async (req, res) => {
  *     responses:
  *       201:
  *         description: Trip created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: The unique identifier (UUID) of the created trip
+ *                   example: 550e8400-e29b-41d4-a716-446655440000
+ *                 user_id:
+ *                   type: string
+ *                   description: User ID who created the trip
+ *                   example: 123e4567-e89b-12d3-a456-426614174000
+ *                 name:
+ *                   type: string
+ *                   example: Summer Europe Tour
+ *                 description:
+ *                   type: string
+ *                   example: A memorable journey through European cities
+ *                 start_date:
+ *                   type: string
+ *                   format: date
+ *                   example: 2025-07-01
+ *                 end_date:
+ *                   type: string
+ *                   format: date
+ *                   example: 2025-07-15
+ *                 cover_photo:
+ *                   type: string
+ *                   example: https://example.com/photo.jpg
+ *                 budget:
+ *                   type: number
+ *                   example: 5000
+ *                 status:
+ *                   type: string
+ *                   enum: [planning, ongoing, completed, cancelled]
+ *                   example: planning
+ *                 created_at:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2025-01-15T10:30:00Z
+ *                 updated_at:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2025-01-15T10:30:00Z
  *       400:
  *         description: Bad request
  *       401:
