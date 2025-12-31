@@ -31,6 +31,9 @@ const slides = [
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startPos, setStartPos] = useState(0);
+  const [currentTranslate, setCurrentTranslate] = useState(0);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -51,6 +54,67 @@ const HeroSlider = () => {
     if (direction === "next") nextSlide();
     else prevSlide();
     setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  // Drag/Swipe handlers
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setStartPos(clientX);
+    setIsAutoPlaying(false);
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return;
+    const currentPosition = clientX;
+    const diff = currentPosition - startPos;
+    setCurrentTranslate(diff);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50; // Minimum drag distance to trigger slide change
+    if (currentTranslate > threshold) {
+      prevSlide();
+    } else if (currentTranslate < -threshold) {
+      nextSlide();
+    }
+    
+    setCurrentTranslate(0);
+    setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  // Mouse events
+  const handleMouseDown = (e: React.MouseEvent) => {
+    handleDragStart(e.clientX);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    handleDragMove(e.clientX);
+  };
+
+  const handleMouseUp = () => {
+    handleDragEnd();
+  };
+
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleDragEnd();
+    }
+  };
+
+  // Touch events
+  const handleTouchStart = (e: React.TouchEvent) => {
+    handleDragStart(e.touches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    handleDragMove(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    handleDragEnd();
   };
 
   // Get indices for the layered effect
@@ -102,7 +166,17 @@ const HeroSlider = () => {
 
         {/* Layered Carousel Container - Fixed glitches */}
         <div className="relative max-w-7xl mx-auto h-[280px] md:h-[360px] flex items-center justify-center">
-          <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '2500px' }}>
+          <div 
+            className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none" 
+            style={{ perspective: '2500px' }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {/* Background layers - Left side cards - HIDDEN behind center */}
             <div 
               className="absolute left-[2%] md:left-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-in-out z-[1]"
