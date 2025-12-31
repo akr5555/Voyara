@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
@@ -191,22 +190,6 @@ const HeroSlider = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent" />
             </div>
-
-            {/* Navigation Arrows */}
-            <button
-              onClick={() => handleManualNavigation("prev")}
-              className="absolute left-3 md:left-8 top-1/2 -translate-y-1/2 z-[20] w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/95 backdrop-blur-sm shadow-xl flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all duration-200"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
-            </button>
-            <button
-              onClick={() => handleManualNavigation("next")}
-              className="absolute right-3 md:right-8 top-1/2 -translate-y-1/2 z-[20] w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/95 backdrop-blur-sm shadow-xl flex items-center justify-center hover:bg-white hover:scale-110 active:scale-95 transition-all duration-200"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-800" />
-            </button>
           </div>
         </div>
 
