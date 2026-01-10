@@ -251,62 +251,82 @@ const TripDetails = () => {
               </div>
 
               {/* Day 1 */}
-              <div className="flex flex-col items-center">
+              <div 
+                className="flex flex-col items-center cursor-pointer group"
+                onClick={() => navigate(`/trip/${id}/day/1`)}
+              >
                 <div className="relative z-10">
-                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white">
+                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white group-hover:border-orange-300 transition-all duration-300 group-hover:scale-110">
                     <div className="text-center">
                       <p className="text-xs text-gray-500">Day 1</p>
-                      <Sunrise className="w-8 h-8 text-orange-500 mx-auto" />
+                      <Sunrise className="w-8 h-8 text-orange-500 mx-auto group-hover:scale-110 transition-transform" />
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-orange-200">
+                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-orange-200 group-hover:border-orange-400 group-hover:shadow-2xl transition-all duration-300">
                   <h3 className="font-bold text-orange-600 mb-1">Day 1</h3>
                   <p className="text-sm text-gray-600">Explore and enjoy your first day</p>
+                  <p className="text-xs text-orange-600 mt-2 font-medium">Click to plan activities →</p>
                 </div>
               </div>
 
               {/* Day 2 */}
-              <div className="flex flex-col items-center">
+              <div 
+                className="flex flex-col items-center cursor-pointer group"
+                onClick={() => navigate(`/trip/${id}/day/2`)}
+              >
                 <div className="relative z-10">
-                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white">
+                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white group-hover:border-purple-300 transition-all duration-300 group-hover:scale-110">
                     <div className="text-center">
                       <p className="text-xs text-gray-500">Day 2</p>
-                      <Utensils className="w-8 h-8 text-purple-500 mx-auto" />
+                      <Utensils className="w-8 h-8 text-purple-500 mx-auto group-hover:scale-110 transition-transform" />
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-purple-200">
+                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-purple-200 group-hover:border-purple-400 group-hover:shadow-2xl transition-all duration-300">
                   <h3 className="font-bold text-purple-600 mb-1">Day 2</h3>
-                  <p className="text-sm text-gray-600">Click on the activity activity planner for each day</p>
+                  <p className="text-sm text-gray-600">Click on the activity planner for each day</p>
+                  <p className="text-xs text-purple-600 mt-2 font-medium">Click to plan activities →</p>
                 </div>
               </div>
 
               {/* Day 3 */}
-              <div className="flex flex-col items-center">
+              <div 
+                className="flex flex-col items-center cursor-pointer group"
+                onClick={() => navigate(`/trip/${id}/day/3`)}
+              >
                 <div className="relative z-10">
-                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white">
+                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white group-hover:border-pink-300 transition-all duration-300 group-hover:scale-110">
                     <div className="text-center">
                       <p className="text-xs text-gray-500">Day 3</p>
-                      <Hotel className="w-8 h-8 text-pink-500 mx-auto" />
+                      <Hotel className="w-8 h-8 text-pink-500 mx-auto group-hover:scale-110 transition-transform" />
                     </div>
                   </div>
+                </div>
+                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-pink-200 group-hover:border-pink-400 group-hover:shadow-2xl transition-all duration-300">
+                  <h3 className="font-bold text-pink-600 mb-1">Day 3</h3>
+                  <p className="text-sm text-gray-600">Plan your third day activities</p>
+                  <p className="text-xs text-pink-600 mt-2 font-medium">Click to plan activities →</p>
                 </div>
               </div>
 
               {/* Day 4 */}
-              <div className="flex flex-col items-center">
+              <div 
+                className="flex flex-col items-center cursor-pointer group"
+                onClick={() => navigate(`/trip/${id}/day/4`)}
+              >
                 <div className="relative z-10">
-                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white">
+                  <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-2xl border-4 border-white group-hover:border-blue-300 transition-all duration-300 group-hover:scale-110">
                     <div className="text-center">
                       <p className="text-xs text-gray-500">Day 4</p>
-                      <MapPin className="w-8 h-8 text-blue-500 mx-auto" />
+                      <MapPin className="w-8 h-8 text-blue-500 mx-auto group-hover:scale-110 transition-transform" />
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-blue-200">
+                <div className="mt-4 bg-white rounded-2xl shadow-xl p-4 max-w-xs text-center border-2 border-blue-200 group-hover:border-blue-400 group-hover:shadow-2xl transition-all duration-300">
                   <h3 className="font-bold text-blue-600 mb-1">Day 4</h3>
                   <p className="text-sm text-gray-600">Click to view an activity planner for the day</p>
+                  <p className="text-xs text-blue-600 mt-2 font-medium">Click to plan activities →</p>
                 </div>
               </div>
 

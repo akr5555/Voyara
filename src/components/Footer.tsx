@@ -1,8 +1,17 @@
 import { Mail, MapPin, Phone, Instagram, Facebook, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLocation } from "react-router-dom";
 
 const Footer = () => {
+  const location = useLocation();
+  
+  // Use coral/peach theme for landing page, blue theme for other pages
+  const isLandingPage = location.pathname === '/';
+  const footerBgClass = isLandingPage
+    ? "bg-gradient-to-r from-coral-light/95 to-peach/95"
+    : "bg-gradient-to-r from-slate-50 via-blue-50 to-indigo-50";
+
   const quickLinks = [
     { label: "Home", href: "#home" },
     { label: "Destinations", href: "#destinations" },
@@ -20,11 +29,8 @@ const Footer = () => {
   ];
 
   return (
-    <footer id="about" className="relative overflow-hidden pt-12 sm:pt-16 pb-6 sm:pb-8"
-      style={{
-        background: 'linear-gradient(135deg, #E8A587 0%, #F4C4B4 50%, #E8A587 100%)',
-      }}
-    >
+    <footer id="about" className={`relative overflow-hidden pt-12 sm:pt-16 pb-6 sm:pb-8 ${footerBgClass} backdrop-blur-sm`}>
+
       {/* Diagonal geometric shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-50">
         <div className="absolute top-0 left-0 w-full h-full"

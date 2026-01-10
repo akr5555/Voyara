@@ -75,8 +75,14 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // Use coral/peach theme for landing page, blue theme for other pages
+  const isLandingPage = location.pathname === '/';
+  const headerBgClass = isLandingPage 
+    ? "bg-gradient-to-r from-coral-light/90 to-peach/90" 
+    : "bg-gradient-to-r from-slate-50/95 via-blue-50/95 to-indigo-100/95";
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-coral-light/90 to-peach/90 backdrop-blur-xl border-b border-white/30 shadow-lg">
+    <header className={`fixed top-0 left-0 right-0 z-50 ${headerBgClass} backdrop-blur-xl border-b border-white/30 shadow-lg`}>
       <div className="container mx-auto px-3 sm:px-4 lg:px-6">
         <div className="flex items-center justify-between h-16 sm:h-20">
           {/* Logo */}

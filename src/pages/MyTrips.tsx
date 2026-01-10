@@ -5,10 +5,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, MapPin, Calendar, Edit, Trash2 } from "lucide-react";
+import { Loader2, Plus, MapPin, Calendar as CalendarIcon, Edit, Trash2, Save } from "lucide-react";
 import { format } from "date-fns";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +44,17 @@ const MyTrips = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    description: "",
+    start_date: undefined as Date | undefined,
+    end_date: undefined as Date | undefined,
+    cover_image_url: "",
+    status: "planning"
+  });
 
   const fetchTrips = useCallback(async () => {
     try {
@@ -99,6 +117,93 @@ const MyTrips = () => {
         title: "Error",
         description: "Failed to delete trip"
       });
+    }
+  };
+
+  const handleEditClick = (trip: Trip, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingTrip(trip);
+    setEditFormData({
+      name: trip.name,
+      description: trip.description || "",
+      start_date: new Date(trip.start_date),
+      end_date: new Date(trip.end_date),
+      cover_image_url: trip.cover_image_url || "",
+      status: trip.status
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingTrip) return;
+
+    // Validation
+    if (!editFormData.name.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please enter a trip name"
+      });
+      return;
+    }
+
+    if (!editFormData.start_date || !editFormData.end_date) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please select start and end dates"
+      });
+      return;
+    }
+
+    if (editFormData.end_date < editFormData.start_date) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "End date must be after start date"
+      });
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      const updateData = {
+        name: editFormData.name,
+        description: editFormData.description,
+        start_date: format(editFormData.start_date, 'yyyy-MM-dd'),
+        end_date: format(editFormData.end_date, 'yyyy-MM-dd'),
+        cover_image_url: editFormData.cover_image_url || null,
+        status: editFormData.status,
+        updated_at: new Date().toISOString()
+      };
+
+      const { error } = await supabase
+        .from('trips')
+        .update(updateData)
+        .eq('id', editingTrip.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "Trip updated successfully"
+      });
+
+      setEditDialogOpen(false);
+      setEditingTrip(null);
+      
+      // Refresh trips list
+      fetchTrips();
+    } catch (error) {
+      console.error('Update trip error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update trip"
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -223,7 +328,7 @@ const MyTrips = () => {
 
                 <CardContent className="pt-3 sm:pt-4 px-4 sm:px-6 pb-3 sm:pb-4">
                   <div className="flex items-center gap-2 text-xs sm:text-sm text-slate-700 bg-blue-50/50 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-blue-100">
-                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-600 flex-shrink-0" />
+                    <CalendarIcon className="w-3 h-3 sm:w-4 sm:h-4 text-indigo-600 flex-shrink-0" />
                     <span className="font-medium truncate">
                       {format(new Date(trip.start_date), 'MMM d, yyyy')} - {format(new Date(trip.end_date), 'MMM d, yyyy')}
                     </span>
@@ -234,10 +339,7 @@ const MyTrips = () => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // TODO: Navigate to edit page when ready
-                    }}
+                    onClick={(e) => handleEditClick(trip, e)}
                     className="flex-1 border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all text-xs sm:text-sm h-8 sm:h-9"
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
@@ -273,6 +375,158 @@ const MyTrips = () => {
           </div>
         )}
       </div>
+
+      {/* Edit Trip Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl sm:text-2xl bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent font-bold">
+              Edit Trip
+            </DialogTitle>
+            <DialogDescription>
+              Update your trip details below
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 sm:space-y-6 py-4">
+            {/* Trip Name */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-name" className="text-sm font-semibold text-slate-700">Trip Name *</Label>
+              <Input
+                id="edit-name"
+                placeholder="e.g., Summer Vacation 2026"
+                value={editFormData.name}
+                onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20"
+              />
+            </div>
+
+            {/* Description */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-description" className="text-sm font-semibold text-slate-700">Description</Label>
+              <Textarea
+                id="edit-description"
+                placeholder="Describe your trip..."
+                value={editFormData.description}
+                onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                rows={3}
+                className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 resize-none"
+              />
+            </div>
+
+            {/* Dates */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-slate-700">Start Date *</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-500",
+                        !editFormData.start_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {editFormData.start_date ? format(editFormData.start_date, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editFormData.start_date}
+                      onSelect={(date) => setEditFormData({ ...editFormData, start_date: date })}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold text-slate-700">End Date *</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal border-slate-300 hover:border-indigo-500",
+                        !editFormData.end_date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {editFormData.end_date ? format(editFormData.end_date, "PPP") : "Pick a date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={editFormData.end_date}
+                      onSelect={(date) => setEditFormData({ ...editFormData, end_date: date })}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Status */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-status" className="text-sm font-semibold text-slate-700">Status</Label>
+              <select
+                id="edit-status"
+                value={editFormData.status}
+                onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                className="w-full h-10 rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none"
+              >
+                <option value="planning">Planning</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+
+            {/* Cover Image URL */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-cover" className="text-sm font-semibold text-slate-700">Cover Image URL</Label>
+              <Input
+                id="edit-cover"
+                placeholder="https://example.com/image.jpg"
+                value={editFormData.cover_image_url}
+                onChange={(e) => setEditFormData({ ...editFormData, cover_image_url: e.target.value })}
+                className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20"
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setEditDialogOpen(false)}
+              disabled={saving}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={saving}
+              className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-xl"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

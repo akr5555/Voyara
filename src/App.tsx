@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import CreateTrip from "./pages/CreateTrip";
 import MyTrips from "./pages/MyTrips";
 import TripDetails from "./pages/TripDetails";
+import DayPlanner from "./pages/DayPlanner";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/create-trip" element={<CreateTrip />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/my-trips/:id" element={<TripDetails />} />
+          <Route path="/trip/:tripId/day/:dayNumber" element={<DayPlanner />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
