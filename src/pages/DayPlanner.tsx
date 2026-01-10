@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Calendar, Users, DollarSign, Sparkles, Check, ChevronsUpDown, Search, ChevronDown } from "lucide-react";
+import { MapPin, Calendar, Users, DollarSign, Sparkles, Check, ChevronsUpDown, Search, ChevronDown, Star } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import VegaAI from "@/components/VegaAI";
@@ -746,8 +746,8 @@ const DayPlanner = () => {
                 }}
                 className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
               >
-                <Sparkles className="w-4 h-4 mr-2" />
-                ✨ Ask Vega ✨
+                <Star className="w-4 h-4 mr-2 fill-white" />
+                Ask Vega
               </Button>
               <p className="text-xs text-slate-500 text-center mt-2">Ask for activity suggestions</p>
 
@@ -756,8 +756,8 @@ const DayPlanner = () => {
                 <div className="mt-4 border-t pt-4 animate-fade-in">
                   <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-4 border border-teal-200">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow p-1">
-                        <img src="/logo.png" alt="Vega" className="w-full h-full object-contain" />
+                      <div className="w-8 h-8 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-full flex items-center justify-center shadow">
+                        <Star className="w-4 h-4 text-white fill-white" />
                       </div>
                       <h4 className="font-bold text-slate-800">Vega</h4>
                       <Button
