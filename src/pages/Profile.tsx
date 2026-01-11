@@ -103,7 +103,7 @@ const Profile = () => {
         updated_at: new Date().toISOString()
       };
       
-      console.log('💾 Attempting to save profile:', updateData);
+      console.log('💾 Saving User Profile...', updateData);
       
       const { error } = await supabase
         .from('user_profiles')
@@ -113,13 +113,13 @@ const Profile = () => {
         }) as { error: Error | null };
 
       if (error) {
-        console.error('❌ Supabase error details:', error);
+        console.error('❌ Supabase error: ', error);
         console.error('Error message:', error.message);
         console.error('Error details:', JSON.stringify(error, null, 2));
         throw error;
       }
 
-      console.log('✅ Profile saved successfully');
+      console.log('✅ User Profile saved successfully');
 
       // Dispatch custom event to notify Header to refresh
       window.dispatchEvent(new CustomEvent('profileUpdated', { detail: { full_name: profile.full_name } }));
@@ -129,7 +129,7 @@ const Profile = () => {
         description: "Your profile has been updated."
       });
     } catch (error: unknown) {
-      console.error('🚨 Save error:', error);
+      console.error('🚨 Save Failed:', error);
       
       // Check if it's a table doesn't exist error
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -208,6 +208,11 @@ const Profile = () => {
       
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 mt-16 sm:mt-20 relative z-10">
         <div className="max-w-3xl mx-auto">
+          {/* Development Notice */}
+        <div className="mb-6 rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-3 text-center text-sm text-indigo-700">
+           Profile features are under active development. Some options may change.
+        </div>
+
           {/* Header with Gradient Text */}
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 bg-clip-text text-transparent px-2">
