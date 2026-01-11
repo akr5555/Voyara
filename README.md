@@ -32,7 +32,8 @@ To keep our repository clean, we have moved detailed explanations to dedicated f
 * **[ Documentation Folder (Docs)](./docs/)**: Contains the detailed breakdown of our architecture:
   * **[Flowchart Explanation](./docs/FLOWCHART.md)**
   * **[Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)**
-* **[ Visual Assets](./assets/)**: Contains the high-resolution **PNG images** of all flowcharts, database schemas, and wireframes.
+* **[ Visual Assets](./assets/)**: Contains the high-resolution **PNG images** and **Demo Vedio** of all flowcharts, database schemas, and wireframes.
+*  **[Demo Vedio](./assets/Voyara_video.mp4)**
 
 ---
 
