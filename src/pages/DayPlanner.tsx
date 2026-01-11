@@ -487,12 +487,192 @@ const DayPlanner = () => {
   const totalDays = calculateDays();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Animated Background */}
+    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 relative overflow-hidden">
+      {/* Enhanced 3D Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-20 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-indigo-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        {/* Layered gradient backdrop */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-100/40 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-pink-100/40 via-transparent to-transparent"></div>
+        
+        {/* Main floating orbs with glow effect */}
+        <div className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-br from-purple-400/25 to-pink-400/25 rounded-full blur-3xl animate-float shadow-[0_0_100px_rgba(168,85,247,0.4)]" style={{ animationDelay: '0s', animationDuration: '8s' }}></div>
+        <div className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-br from-violet-400/20 to-indigo-400/20 rounded-full blur-3xl animate-float shadow-[0_0_80px_rgba(139,92,246,0.3)]" style={{ animationDelay: '2s', animationDuration: '10s' }}></div>
+        <div className="absolute bottom-20 left-1/4 w-72 h-72 bg-gradient-to-br from-cyan-400/25 to-teal-400/25 rounded-full blur-3xl animate-float shadow-[0_0_90px_rgba(34,211,238,0.4)]" style={{ animationDelay: '4s', animationDuration: '12s' }}></div>
+        <div className="absolute bottom-10 right-1/3 w-64 h-64 bg-gradient-to-br from-rose-400/20 to-orange-400/20 rounded-full blur-3xl animate-float shadow-[0_0_70px_rgba(251,113,133,0.3)]" style={{ animationDelay: '1s', animationDuration: '9s' }}></div>
+        
+        {/* Secondary smaller orbs for depth */}
+        <div className="absolute top-1/3 left-1/2 w-48 h-48 bg-gradient-to-br from-fuchsia-300/15 to-purple-300/15 rounded-full blur-2xl animate-float-reverse" style={{ animationDuration: '15s' }}></div>
+        <div className="absolute top-2/3 right-1/2 w-56 h-56 bg-gradient-to-br from-sky-300/15 to-cyan-300/15 rounded-full blur-2xl animate-float-reverse" style={{ animationDelay: '3s', animationDuration: '13s' }}></div>
+        
+        {/* Particle-like dots */}
+        <div className="absolute top-20 left-1/4 w-2 h-2 bg-purple-400/40 rounded-full animate-pulse-slow"></div>
+        <div className="absolute top-1/2 left-1/3 w-3 h-3 bg-pink-400/40 rounded-full animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-1/4 right-1/3 w-2 h-2 bg-violet-400/40 rounded-full animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/3 right-1/4 w-2 h-2 bg-cyan-400/40 rounded-full animate-pulse-slow" style={{ animationDelay: '0.5s' }}></div>
+        
+        {/* Grid pattern with enhanced visibility */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8b5cf625_1px,transparent_1px),linear-gradient(to_bottom,#8b5cf625_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_110%)]"></div>
+        
+        {/* Animated wave lines */}
+        <div className="absolute top-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-300/30 to-transparent animate-wave"></div>
+        <div className="absolute top-2/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-300/30 to-transparent animate-wave" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-3/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-violet-300/30 to-transparent animate-wave" style={{ animationDelay: '4s' }}></div>
+        
+        {/* Geometric shapes with multiple animations */}
+        <div className="absolute top-1/4 left-1/3 w-32 h-32 border-2 border-purple-300/40 rounded-lg rotate-45 animate-spin-slow shadow-[0_0_30px_rgba(168,85,247,0.2)]"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-24 h-24 border-2 border-pink-300/40 rounded-full animate-pulse-glow"></div>
+        <div className="absolute top-1/2 right-1/3 w-20 h-20 border-2 border-cyan-300/30 rounded-lg animate-rotate-reverse" style={{ animationDuration: '25s' }}></div>
+        <div className="absolute bottom-1/4 left-1/4 w-28 h-28 border-2 border-violet-300/30 rounded-full animate-scale-pulse"></div>
+        
+        {/* Light rays effect */}
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-purple-200/20 via-purple-300/30 to-transparent animate-shimmer"></div>
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-pink-200/20 via-pink-300/30 to-transparent animate-shimmer" style={{ animationDelay: '1.5s' }}></div>
       </div>
+      
+      {/* Enhanced custom animations */}
+      <style>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translate(0, 0) scale(1) rotate(0deg);
+          }
+          25% {
+            transform: translate(20px, -20px) scale(1.05) rotate(5deg);
+          }
+          50% {
+            transform: translate(-15px, 15px) scale(0.95) rotate(-5deg);
+          }
+          75% {
+            transform: translate(15px, 10px) scale(1.02) rotate(3deg);
+          }
+        }
+        
+        @keyframes float-reverse {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+          }
+          25% {
+            transform: translate(-25px, 20px) scale(0.95);
+          }
+          50% {
+            transform: translate(20px, -15px) scale(1.05);
+          }
+          75% {
+            transform: translate(-10px, -20px) scale(0.98);
+          }
+        }
+        
+        @keyframes spin-slow {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        
+        @keyframes rotate-reverse {
+          from {
+            transform: rotate(360deg);
+          }
+          to {
+            transform: rotate(0deg);
+          }
+        }
+        
+        @keyframes pulse-glow {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 0.6;
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 1;
+            box-shadow: 0 0 40px rgba(236, 72, 153, 0.5);
+          }
+        }
+        
+        @keyframes pulse-slow {
+          0%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.5);
+          }
+        }
+        
+        @keyframes scale-pulse {
+          0%, 100% {
+            transform: scale(1);
+            opacity: 0.4;
+          }
+          50% {
+            transform: scale(1.15);
+            opacity: 0.7;
+          }
+        }
+        
+        @keyframes wave {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes shimmer {
+          0%, 100% {
+            opacity: 0.2;
+          }
+          50% {
+            opacity: 0.6;
+          }
+        }
+        
+        .animate-float {
+          animation: float 8s ease-in-out infinite;
+        }
+        
+        .animate-float-reverse {
+          animation: float-reverse 15s ease-in-out infinite;
+        }
+        
+        .animate-spin-slow {
+          animation: spin-slow 20s linear infinite;
+        }
+        
+        .animate-rotate-reverse {
+          animation: rotate-reverse 25s linear infinite;
+        }
+        
+        .animate-pulse-glow {
+          animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        .animate-pulse-slow {
+          animation: pulse-slow 4s ease-in-out infinite;
+        }
+        
+        .animate-scale-pulse {
+          animation: scale-pulse 5s ease-in-out infinite;
+        }
+        
+        .animate-wave {
+          animation: wave 8s linear infinite;
+        }
+        
+        .animate-shimmer {
+          animation: shimmer 6s ease-in-out infinite;
+        }
+      `}</style>
 
       <Header />
       
