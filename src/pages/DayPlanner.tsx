@@ -146,6 +146,7 @@ const DayPlanner = () => {
   const [vegaActivities, setVegaActivities] = useState<any[]>([]);
   const [vegaLoading, setVegaLoading] = useState(false);
   const [vegaError, setVegaError] = useState<string | null>(null);
+  const [vegaModel, setVegaModel] = useState<string | null>(null);
   const [userMessage, setUserMessage] = useState("");
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
@@ -417,6 +418,11 @@ const DayPlanner = () => {
       
       console.log('📋 Extracted activities:', activities);
       console.log('📋 Activities length:', activities.length);
+      
+      // Extract model information
+      const modelName = data.model || data.powered_by || data.ai_model || null;
+      console.log('🤖 AI Model:', modelName);
+      setVegaModel(modelName);
       
       setVegaActivities(activities);
       
@@ -1295,9 +1301,6 @@ const DayPlanner = () => {
                           📎
                         </Button>
                       </div>
-                      <p className="text-xs text-slate-500 text-center mt-2">
-                        Powered by <span className="font-semibold text-teal-600">PHI-4 Ollama</span>
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -1462,9 +1465,6 @@ const DayPlanner = () => {
                       Send
                     </Button>
                   </div>
-                  <p className="text-xs text-slate-500">
-                    Powered by <span className="font-semibold text-teal-600">PHI-4 Ollama</span>
-                  </p>
                 </div>
                 </>
                 )}
