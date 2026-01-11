@@ -82,11 +82,49 @@ app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
  * /api/health:
  *   get:
  *     summary: Health check endpoint
- *     description: Returns the health status of the API
+ *     description: Returns the health status of the API, including uptime and environment information
  *     tags: [System]
  *     responses:
  *       200:
- *         description: API is healthy
+ *         description: API is healthy and operational
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - status
+ *                 - timestamp
+ *                 - uptime
+ *                 - environment
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ *                   description: Health status of the API
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   description: Current server timestamp
+ *                   example: '2026-01-11T10:30:00.000Z'
+ *                 uptime:
+ *                   type: number
+ *                   description: Server uptime in seconds
+ *                   example: 3600.5
+ *                 environment:
+ *                   type: string
+ *                   description: Current environment
+ *                   example: development
+ *                   enum: [development, production, test]
+ *                 version:
+ *                   type: string
+ *                   description: API version
+ *                   example: '1.0.0'
+ *                 nodeVersion:
+ *                   type: string
+ *                   description: Node.js version
+ *                   example: 'v18.17.0'
+ *       503:
+ *         description: Service unavailable
  *         content:
  *           application/json:
  *             schema:
@@ -94,16 +132,38 @@ app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
  *               properties:
  *                 status:
  *                   type: string
- *                   example: ok
- *                 timestamp:
+ *                   example: error
+ *                 message:
  *                   type: string
- *                   format: date-time
+ *                   example: Service is currently unavailable
  */
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString()
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    // Test database connection
+    const { error: dbError } = await supabase
+      .from('users')
+      .select('count')
+      .limit(1);
+
+    const healthStatus = {
+      status: dbError ? 'degraded' : 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: Math.floor(process.uptime()),
+      environment: process.env.NODE_ENV || 'development',
+      version: '1.0.0',
+      nodeVersion: process.version,
+      database: dbError ? 'disconnected' : 'connected'
+    };
+
+    const statusCode = dbError ? 503 : 200;
+    res.status(statusCode).json(healthStatus);
+  } catch (error) {
+    res.status(503).json({
+      status: 'error',
+      message: 'Service is currently unavailable',
+      timestamp: new Date().toISOString()
+    });
+  }
 });
 
 /**
