@@ -143,9 +143,14 @@ const DayPlanner = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [countryOpen, setCountryOpen] = useState(false);
   const [cityOpen, setCityOpen] = useState(false);
+  const [vegaActivities, setVegaActivities] = useState<any[]>([]);
+  const [vegaLoading, setVegaLoading] = useState(false);
+  const [vegaError, setVegaError] = useState<string | null>(null);
+  const [userMessage, setUserMessage] = useState("");
   const [customCountryMode, setCustomCountryMode] = useState(false);
   const [customCityMode, setCustomCityMode] = useState(false);
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [addedActivities, setAddedActivities] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -224,8 +229,6 @@ const DayPlanner = () => {
 
       const updateData = {
         destination: `${selectedCity}, ${selectedCountry}`.trim(),
-        adults,
-        kids,
         budget: totalBudget,
         updated_at: new Date().toISOString()
       };
@@ -284,6 +287,175 @@ const DayPlanner = () => {
       if (error) throw error;
     } catch (error) {
       console.error('Error saving preferences:', error);
+    }
+  };
+
+  const addActivityToPlan = (activity: any) => {
+    // Check if already added
+    const alreadyAdded = addedActivities.some(
+      (a) => (a.title || a.name) === (activity.title || activity.name)
+    );
+
+    if (alreadyAdded) {
+      toast({
+        title: "Already Added",
+        description: "This activity is already in your plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Calculate total price based on adults and children
+    const adultPrice = activity.estimated_price_adult || 0;
+    const childPrice = activity.estimated_price_child || 0;
+    const totalPrice = (adults * adultPrice) + (kids * childPrice);
+    
+    // Add calculated price to activity object
+    const activityWithPrice = {
+      ...activity,
+      calculatedTotalPrice: totalPrice,
+    };
+
+    setAddedActivities([...addedActivities, activityWithPrice]);
+    
+    // Update budget
+    setBudget(budget + totalPrice);
+    
+    toast({
+      title: "Added to Plan!",
+      description: `${activity.title || activity.name} added to your trip plan.`,
+    });
+  };
+
+  const removeActivityFromPlan = (index: number) => {
+    const removedActivity = addedActivities[index];
+    const activityPrice = removedActivity.calculatedTotalPrice || 0;
+    
+    setAddedActivities(addedActivities.filter((_, i) => i !== index));
+    setBudget(Math.max(0, budget - activityPrice));
+    
+    toast({
+      title: "Removed",
+      description: "Activity removed from your plan.",
+    });
+  };
+
+  const fetchVegaSuggestions = async () => {
+    if (!tripId || !selectedCity || !selectedCountry) {
+      toast({
+        title: "Missing Information",
+        description: "Please select a city and country first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('🤖 Fetching Vega AI suggestions...');
+    setVegaLoading(true);
+    setVegaError(null);
+
+    const requestBody = {
+      trip_id: tripId,
+      city: selectedCity,
+      country: selectedCountry,
+      day: parseInt(dayNumber || '1'),
+      time_slot: selectedTimeOfDay,
+      total_budget: totalBudget,
+      remaining_budget: totalBudget - budget,
+      preferences: preferences,
+      adults: adults,
+      children: kids,
+    };
+
+    console.log('📤 Request body:', requestBody);
+
+    try {
+      const response = await fetch('https://vegaai-auhl.onrender.com/api/ai/vega/suggest', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('📥 Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ API error response:', errorText);
+        throw new Error(`API error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ Vega AI response:', JSON.stringify(data, null, 2));
+      console.log('📋 Response type:', typeof data);
+      console.log('📋 Is Array?:', Array.isArray(data));
+      console.log('📋 Response keys:', Object.keys(data));
+      
+      // Handle different response formats
+      let activities = [];
+      
+      // Check if response is directly an array
+      if (Array.isArray(data)) {
+        activities = data;
+        console.log('📋 Response is array, using directly');
+      } else if (data.activities) {
+        activities = data.activities;
+        console.log('📋 Found activities in data.activities');
+      } else if (data.suggestions) {
+        activities = data.suggestions;
+        console.log('📋 Found activities in data.suggestions');
+      } else if (data.data) {
+        activities = data.data;
+        console.log('📋 Found activities in data.data');
+      } else if (data.results) {
+        activities = data.results;
+        console.log('📋 Found activities in data.results');
+      } else {
+        console.warn('⚠️ No activities found in standard keys. Full response:', data);
+      }
+      
+      console.log('📋 Extracted activities:', activities);
+      console.log('📋 Activities length:', activities.length);
+      
+      setVegaActivities(activities);
+      
+      if (activities.length > 0) {
+        toast({
+          title: "Success!",
+          description: `Vega found ${activities.length} activities for you.`,
+        });
+      } else {
+        // Check if API responded successfully but with no suggestions
+        if (data.success && data.message) {
+          console.warn('⚠️ API responded successfully but returned no suggestions');
+          setVegaError(`${data.message}. Try different preferences or location.`);
+          toast({
+            title: "No Activities Found",
+            description: data.message || "Vega couldn't find activities matching your criteria.",
+          });
+        } else {
+          console.error('❌ API returned empty data. Expected format: { "activities": [...] } or { "suggestions": [...] }');
+          console.error('❌ Actual response:', data);
+          setVegaError('API returned no activities. Check backend logs.');
+          toast({
+            title: "No Activities Found",
+            description: "The AI didn't return any activities. Please check your backend API.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error: any) {
+      console.error('❌ Vega AI error:', error);
+      setVegaError(error.message || 'Failed to get suggestions. Please try again.');
+      toast({
+        title: "Error",
+        description: error.message || "Failed to get suggestions from Vega AI.",
+        variant: "destructive",
+      });
+    } finally {
+      setVegaLoading(false);
+      console.log('🏁 Vega AI request completed');
     }
   };
 
@@ -739,15 +911,103 @@ const DayPlanner = () => {
                 </div>
               </div>
 
+              {/* Added Activities Section */}
+              {addedActivities.length > 0 && (
+                <div className="mb-4">
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+                    <h3 className="font-semibold text-slate-800 mb-3 text-sm flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      Added to Plan ({addedActivities.length})
+                    </h3>
+                    <div className="space-y-2">
+                      {addedActivities.map((activity, index) => (
+                        <div key={index} className="bg-white rounded-lg p-3 border border-green-200">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="text-xs font-semibold text-slate-800 mb-1">
+                                {activity.title || activity.name}
+                              </h4>
+                              <p className="text-xs text-slate-600 line-clamp-2 mb-2">
+                                {activity.description || activity.details}
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-semibold text-green-700">
+                                  {(() => {
+                                    const price = activity.calculatedTotalPrice || 0;
+                                    if (price === 0) return 'Free';
+                                    
+                                    const currency = activity.currency || 'EUR';
+                                    const symbols: Record<string, string> = {
+                                      'EUR': '€',
+                                      'USD': '$',
+                                      'GBP': '£',
+                                      'INR': '₹',
+                                      'JPY': '¥',
+                                      'AUD': 'A$',
+                                      'CAD': 'C$',
+                                    };
+                                    const symbol = symbols[currency] || currency;
+                                    return `${symbol}${price}`;
+                                  })()}
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => removeActivityFromPlan(index)}
+                              className="h-6 w-6 p-0 hover:bg-red-100 text-red-500"
+                            >
+                              ✕
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-green-200">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-slate-700">Total Cost:</span>
+                        <span className="font-bold text-green-700">
+                          {(() => {
+                            const total = addedActivities.reduce((sum, a) => sum + (a.calculatedTotalPrice || 0), 0);
+                            if (total === 0) return 'Free';
+                            
+                            // Use currency from first activity or default to EUR
+                            const currency = addedActivities[0]?.currency || 'EUR';
+                            const symbols: Record<string, string> = {
+                              'EUR': '€',
+                              'USD': '$',
+                              'GBP': '£',
+                              'INR': '₹',
+                              'JPY': '¥',
+                              'AUD': 'A$',
+                              'CAD': 'C$',
+                            };
+                            const symbol = symbols[currency] || currency;
+                            return `${symbol}${total}`;
+                          })()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Ask Vega Button */}
               <Button 
                 onClick={() => {
-                  setShowVega(!showVega);
+                  if (!showVega) {
+                    setShowVega(true);
+                    fetchVegaSuggestions();
+                  } else {
+                    setShowVega(false);
+                  }
                 }}
                 className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+                disabled={vegaLoading}
               >
                 <Star className="w-4 h-4 mr-2 fill-white" />
-                Ask Vega
+                {vegaLoading ? 'Loading...' : 'Ask Vega'}
               </Button>
               <p className="text-xs text-slate-500 text-center mt-2">Ask for activity suggestions</p>
 
@@ -771,32 +1031,78 @@ const DayPlanner = () => {
                     </div>
                     
                     <div className="bg-white rounded-lg p-3 mb-3">
-                      <p className="text-xs text-slate-600 mb-3">
-                        Here are some free activity ideas for you today (Day {dayNumber || '1'}):
-                      </p>
-                      <ol className="text-xs text-slate-700 space-y-2 list-decimal list-inside">
-                        <li>Stroll along the banks of the Seine</li>
-                        <li>Discover Montmartre and the Sacré-Cœur Basilica</li>
-                        <li>Explore Jardin des Tuileries</li>
-                      </ol>
+                      {vegaLoading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                          <span className="ml-2 text-xs text-slate-600">Vega is thinking...</span>
+                        </div>
+                      ) : vegaError ? (
+                        <div className="text-center py-2">
+                          <p className="text-xs text-red-600 mb-2">{vegaError}</p>
+                          <Button 
+                            size="sm" 
+                            onClick={fetchVegaSuggestions}
+                            className="h-7 text-xs bg-teal-500 hover:bg-teal-600"
+                            disabled={vegaLoading}
+                          >
+                            Try Again
+                          </Button>
+                        </div>
+                      ) : vegaActivities.length > 0 ? (
+                        <>
+                          <div className="flex items-center justify-between mb-3">
+                            <p className="text-xs text-slate-600">
+                              Here are some activity ideas for you today (Day {dayNumber || '1'}):
+                            </p>
+                            <Button 
+                              size="sm" 
+                              variant="ghost"
+                              onClick={fetchVegaSuggestions}
+                              className="h-6 text-xs"
+                              disabled={vegaLoading}
+                            >
+                              🔄
+                            </Button>
+                          </div>
+                          <ol className="text-xs text-slate-700 space-y-2 list-decimal list-inside">
+                            {vegaActivities.map((activity, index) => (
+                              <li key={index}>{activity.title || activity.name || activity}</li>
+                            ))}
+                          </ol>
+                        </>
+                      ) : (
+                        <p className="text-xs text-slate-600">
+                          Click "Ask Vega" to get personalized activity suggestions!
+                        </p>
+                      )}
                     </div>
 
                     <div className="space-y-2">
                       <Input 
                         placeholder="Ask me anything about your trip..."
                         className="text-xs h-9 border-slate-300 bg-white"
+                        value={userMessage}
+                        onChange={(e) => setUserMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !vegaLoading) {
+                            fetchVegaSuggestions();
+                          }
+                        }}
                       />
                       <div className="flex gap-2">
                         <Button 
                           size="sm" 
                           className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 h-8 text-xs"
+                          onClick={fetchVegaSuggestions}
+                          disabled={vegaLoading}
                         >
-                          Send
+                          {vegaLoading ? 'Sending...' : 'Send'}
                         </Button>
                         <Button 
                           size="sm" 
                           variant="outline" 
                           className="h-8 w-8 p-0"
+                          disabled
                         >
                           🎤
                         </Button>
@@ -804,6 +1110,7 @@ const DayPlanner = () => {
                           size="sm" 
                           variant="outline" 
                           className="h-8 w-8 p-0"
+                          disabled
                         >
                           📎
                         </Button>
@@ -865,68 +1172,100 @@ const DayPlanner = () => {
                 {/* Top free activities section */}
                 <div className="p-4 bg-white">
                   <h4 className="text-sm font-bold text-slate-700 mb-3">
-                    Top free activities in {selectedCity || 'Paris'} <span className="text-xs font-normal text-slate-500">(Day {dayNumber || '3'} | {selectedTimeOfDay}):</span>
+                    {vegaLoading ? 'Loading suggestions...' : vegaActivities.length > 0 ? `Suggested activities in ${selectedCity || 'Paris'}` : 'Top activities'} <span className="text-xs font-normal text-slate-500">(Day {dayNumber || '3'} | {selectedTimeOfDay}):</span>
                   </h4>
 
-                  {/* Activity Cards */}
-                  <div className="space-y-3">
-                    {/* Activity 1 */}
-                    <div className="border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <img 
-                        src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&h=200&fit=crop" 
-                        alt="Activity"
-                        className="w-full h-32 object-cover"
-                      />
-                      <div className="p-3">
-                        <div className="flex items-start justify-between mb-2">
-                          <h5 className="font-semibold text-slate-800 text-sm flex-1">
-                            1. Stroll along the banks of the Seine
-                          </h5>
-                        </div>
-                        <p className="text-xs text-slate-600 mb-2">
-                          Enjoy a leisurely walk along the Seine River, take in the beautiful views of the city, and maybe have a picnic by the water.
-                        </p>
-                      </div>
+                  {vegaLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="w-8 h-8 border-3 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
                     </div>
-
-                    {/* Activity 2 */}
-                    <div className="border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <img 
-                        src="https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&h=200&fit=crop" 
-                        alt="Activity"
-                        className="w-full h-32 object-cover"
-                      />
-                      <div className="p-3">
-                        <div className="flex items-start justify-between mb-2">
-                          <h5 className="font-semibold text-slate-800 text-sm flex-1">
-                            2. Discover Montmartre and the Sacré-Cœur Basilica
-                          </h5>
-                        </div>
-                        <p className="text-xs text-slate-600 mb-2">
-                          Visit the iconic Sacré-Cœur Basilica, and catch panoramic views of Paris.
-                        </p>
-                      </div>
+                  ) : vegaError ? (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-red-600 mb-2">{vegaError}</p>
+                      <Button size="sm" onClick={fetchVegaSuggestions} className="bg-teal-500 hover:bg-teal-600">
+                        Try Again
+                      </Button>
                     </div>
-
-                    {/* Activity 3 */}
-                    <div className="border border-slate-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                      <img 
-                        src="https://images.unsplash.com/photo-1524396309943-e03f5249f002?w=400&h=200&fit=crop" 
-                        alt="Activity"
-                        className="w-full h-32 object-cover"
-                      />
-                      <div className="p-3">
-                        <div className="flex items-start justify-between mb-2">
-                          <h5 className="font-semibold text-slate-800 text-sm flex-1">
-                            3. Explore Jardin des Tuileries
-                          </h5>
+                  ) : vegaActivities.length > 0 ? (
+                    <div className="space-y-3">
+                      {vegaActivities.slice(0, 5).map((activity, index) => (
+                        <div key={index} className="border border-slate-200 rounded-lg hover:shadow-md transition-shadow bg-white">
+                          <div className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <h5 className="font-semibold text-slate-800 text-sm flex-1">
+                                {index + 1}. {activity.title || activity.name || 'Activity'}
+                              </h5>
+                            </div>
+                            <p className="text-xs text-slate-600 mb-2">
+                              {activity.description || activity.details || 'Enjoy this amazing activity!'}
+                            </p>
+                            {activity.reason && (
+                              <p className="text-xs text-slate-500 italic mb-3 pl-2 border-l-2 border-teal-200">
+                                {activity.reason}
+                              </p>
+                            )}
+                            <div className="flex items-center justify-between mt-3">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-teal-700">
+                                  {(() => {
+                                    const adultPrice = activity.estimated_price_adult || 0;
+                                    const childPrice = activity.estimated_price_child || 0;
+                                    const totalPrice = (adults * adultPrice) + (kids * childPrice);
+                                    const currency = activity.currency || 'EUR';
+                                    
+                                    // Currency symbol mapping
+                                    const getCurrencySymbol = (curr: string) => {
+                                      const symbols: Record<string, string> = {
+                                        'EUR': '€',
+                                        'USD': '$',
+                                        'GBP': '£',
+                                        'INR': '₹',
+                                        'JPY': '¥',
+                                        'AUD': 'A$',
+                                        'CAD': 'C$',
+                                      };
+                                      return symbols[curr] || curr;
+                                    };
+                                    
+                                    if (totalPrice === 0) return 'Free';
+                                    
+                                    const symbol = getCurrencySymbol(currency);
+                                    
+                                    return (
+                                      <span className="flex flex-col gap-0.5">
+                                        <span>{symbol}{totalPrice}</span>
+                                        <span className="text-xs text-slate-500 font-normal">
+                                          ({symbol}{adultPrice}/adult{childPrice > 0 ? `, ${symbol}${childPrice}/child` : ''})
+                                        </span>
+                                      </span>
+                                    );
+                                  })()}
+                                </span>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white h-8 text-xs"
+                                onClick={() => addActivityToPlan(activity)}
+                              >
+                                + Add to Plan
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-600 mb-2">
-                          Spend some time in the Tuileries Garden, a lovely park near the Louvre, perfect for a relaxing walk.
-                        </p>
-                      </div>
+                      ))}
                     </div>
-                  </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-sm text-slate-600 mb-3">No activities yet.</p>
+                      <Button 
+                        size="sm" 
+                        onClick={fetchVegaSuggestions}
+                        className="bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700"
+                      >
+                        Get Suggestions from Vega
+                      </Button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Chat Input */}
