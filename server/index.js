@@ -26,7 +26,8 @@ app.use((req, res, next) => {
         connectSrc: [
           "'self'",
           "https://*.supabase.co",
-          "https://yrlzcfuubkqdbkwlhjih.supabase.co"
+          "https://yrlzcfuubkqdbkwlhjih.supabase.co",
+          "https://vegaai-auhl.onrender.com"
         ],
         styleSrc: [
           "'self'",
