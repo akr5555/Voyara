@@ -7,7 +7,6 @@
 
 </div>
 
----
 
 ##  The Vision: Revolutionizing Travel Planning
 
@@ -15,117 +14,188 @@ Currently, travel planning is a fragmented, stressful mess of open tabs—flight
 
 **Voyara changes the paradigm.** We are not just another booking engine; we are an intelligent, interactive platform that acts as your **personal local tour guide** for unknown cities.
 
-We gamify the entire process, taking you from an initial dream to a fully structured, budgeted, and actionable itinerary. Our core mission is to surface real-time availability for *local* activities and experiences—the hidden gems that make travel meaningful—and integrate them seamlessly with your logistics.
+Voyara is an **itinerary builder** that gamifies the entire planning process, taking users from an initial travel idea to a **fully structured, day-wise, budgeted, and actionable itinerary**. Our core mission is to surface local activities and meaningful experiences and integrate them seamlessly into a single planning flow.
+
+
+## Problem Statement
+
+Travel planning today is highly fragmented. Users depend on multiple platforms for:
+- Flights and transport  
+- Accommodation  
+- Local attractions and activities  
+- Budget planning  
+- Daily scheduling  
+
+This results in:
+- Disorganized plans  
+- No clear day-wise execution  
+- Poor budget visibility  
+- Generic tourist experiences  
+
+Most platforms stop at bookings and fail to support the **actual travel experience**.
+
+
+## Proposed Solution
+
+Voyara provides an end-to-end **itinerary building platform** that converts scattered travel ideas into a single visual and structured journey.
+
+Voyara enables users to:
+- Plan trips day-by-day using an interactive timeline  
+- Discover local experiences instead of generic tourist lists  
+- Track time and budget together  
+- Receive intelligent AI assistance while staying in full control  
 
 ---
 
 ##  Live Demo, Mobile App & Resources
 
 ###  **[Click Here to Launch Voyara Web Live](https://voyara.onrender.com)**
-*Judges can view and test the live deployment of our platform here.*
+
+### 🎥 Demo Video  
+**[Demo Video – Voyara Walkthrough](./assets/Voyara_video.mp4)**
 
 ###  **[Click Here to View Mobile App Repository](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)**
-*Explore our native mobile application built with **Kotlin Multiplatform (KMP)**.*
+*Native mobile app built using **Kotlin Multiplatform (KMP)**.*
 
 ###  Technical Documentation
-To keep our repository clean, we have moved detailed explanations to dedicated folders:
-* **[ Documentation Folder (Docs)](./docs/)**: Contains the detailed breakdown of our architecture:
-  * **[Flowchart Explanation](./docs/FLOWCHART.md)**
-  * **[Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)**
-* **[ Visual Assets](./assets/)**: Contains the high-resolution **PNG images** and **Demo Vedio** of all flowcharts, database schemas, and wireframes.
-*  **[Demo Vedio](./assets/Voyara_video.mp4)**
+Detailed system documentation is organized inside the repository:
+- **[Docs Folder](./docs/)**
+  - **[Flowchart Explanation](./docs/FLOWCHART.md)**
+  - **[Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)**
+- **[Assets Folder](./assets/)**
+  - Flowcharts
+  - Data Flow Diagrams (DFDs)
+  - Database Schema
+  - UI Wireframes
+
+##  Key Differentiators (Why Voyara)
+
+Voyara solves the hardest part of travel:
+
+> **“What do I do when I get there?”**
+
+###  1. Interactive Journey Timeline
+
+Instead of static lists, Voyara uses a **visual timeline** that represents:
+- Travel legs  
+- Day-wise activity blocks (morning / afternoon / night)  
+- Budget and time distribution  
+
+**Impact:** Planning feels intuitive and engaging instead of overwhelming.
+
+
+### Example: 3-Day Paris Trip in Voyara
+
+- **Day 1:** Eiffel Tower → Louvre → Seine Cruise  
+   Estimated Budget: €120  
+
+- **Day 2:** Montmartre → Local cafés → Street exploration  
+   Estimated Budget: €90  
+
+- **Day 3:** Versailles Day Trip  
+   Estimated Budget: €150  
+
+All of this appears in **one structured timeline**, not scattered notes.
 
 ---
 
-##  Key Differentiators (Why We Win)
+###  2. Local-First Discovery Engine
 
-Voyara stands apart by solving the hardest part of travel: ***"What do I do when I get there?"***
+Voyara prioritizes **local activities and experiences** instead of generic tourist traps.
 
-###  1. The Interactive "Journey Map" Timeline
-
-We replaced boring list views with a visually engaging, winding timeline. It intuitively visualizes your trip flow—from departure transport, through daily morning/afternoon/night activity blocks, to your return journey.
-
-**Impact:** Planning feels like an adventure, not a spreadsheet task.
-
-###  2. The "Local Guide" Discovery Engine
-
-This is our main USP. Unlike competitors offering generic tourist traps, Voyara focuses on surfacing **locally available experiences** with real-time booking capability.
-
-**Impact:** Users discover the city like a local, not just a tourist.
-
-###  3. "Vega" – Your Context-Aware AI Assistant
-
-Vega is not a generic chatbot. Integrated directly into the planning flow, Vega understands your current itinerary context. Stuck on Day 3 in Tokyo? Vega suggests activities based on your previous likes, the location, and weather.
-
-**Impact:** An intelligent co-pilot that enhances every decision.
-
-###  4. One-Click Actionable Budget Excel
-
-We bridge the gap between fun planning and serious logistics. With one click, the entire visual timeline—including transport costs, accommodation, and activity fees—is exported into a detailed, timestamped **Excel Budget Sheet**.
-
-**Impact:** Ready for offline use and financial tracking.
-
----
-
-##  Architectural Flow & User Journey
-
-We have designed a robust end-to-end flow that guides the user from inspiration to actionable output.
-
-*Below is the high-level architectural flowchart illustrating the entire Voyara ecosystem, from user entry to final itinerary generation, highlighting the central role of our Dynamic Visualization and AI assistance.*
+**Impact:** Users explore cities like locals, not checklist tourists.
 
 
+###  3. Vega – Context-Aware AI Assistant (Round-2 Feature)
 
----
+Vega is Voyara’s intelligent **assistive AI** that helps users plan better without taking control away.
 
-##  Tech Stack: Hybrid, Scalable & Intelligent
+#### Design Principles
+- User-in-the-loop (no autonomous actions)  
+- Suggest, don’t decide  
+- Context-aware recommendations  
+- Explainable reasoning  
+- Fail-safe fallback  
 
-We utilize a modern, hybrid technology stack designed for cross-platform performance and high-concurrency AI processing.
+#### What Vega Does
+- Suggests activities for specific days  
+- Helps optimize time and budget  
+- Explains *why* a suggestion fits the itinerary  
 
-| Component | Technology | Why We Chose It |
-| :--- | :--- | :--- |
-| **Mobile Core** | **Kotlin Multiplatform (KMP)** | **Native Performance.** Allows us to share business logic between Android & iOS while maintaining smooth, native UI performance. |
-| **Backend API** | **Node.js & TypeScript** | **Scalability.** Handles authentication, API routing, and high-volume requests with type safety and speed. |
-| **AI Engine** | **Python (GenAI/ML)** | **The Brain of "Vega".** Leverages Python's superior ML libraries to power our Generative AI, processing context-aware travel suggestions. |
-| **Database** | **PostgreSQL** | **Relational Integrity.** Robust storage for complex, nested data structures (Users → Trips → Itineraries → Activities). |
-| **Legacy Integration** | **Java** | **Enterprise Stability.** Used for integrating robust legacy modules and ensuring system reliability. |
+#### What Vega Cannot Do
+- Modify itineraries automatically  
+- Perform bookings  
+- Trigger background actions  
+- Write to databases  
 
----
+Vega fully complies with hackathon AI rules and remains **strictly assistive**.
 
-##  Round 2 Roadmap: Future Innovations
 
-In Round 1, we established the core interactive timeline and the local discovery engine. For Round 2, we plan to evolve Voyara from a planning tool into a **proactive travel ecosystem**.
+###  4. One-Click Budget Export
 
-Here is our concrete plan for expansion, focusing on **AI-driven personalization** and **geospatial integration**:
+Voyara converts the entire itinerary into a structured **Excel budget sheet**, including:
+- Transport costs  
+- Activity costs  
+- Daily breakdown  
 
-###  1. AI-Driven "Zero-Touch" Itinerary Generation
+**Impact:** Offline-ready and practical for real travel use.
 
-Currently, users build trips manually. In Round 2, we will upgrade **Vega AI** to generate complete, multi-day itineraries instantly based on a simple prompt.
 
-**Example:** *"A 5-day family trip to Kyoto focusing on food and history, budget $3k"*
+## Data Flow & System Design
 
-**Technical Approach:** This requires moving from simple suggestions to complex constraint satisfaction planning powered by LLMs.
+Voyara follows a clean and modular architecture.
 
-###  2. Geospatial Integration & Dynamic Mapping
+- User inputs flow through authentication and trip planning modules  
+- Timeline data is processed centrally  
+- Vega AI receives **read-only contextual data**  
+- All suggestions return to the UI for **explicit user approval**  
 
-We will integrate interactive maps (e.g., Mapbox/Google Maps API) directly into the timeline view.
+ Detailed **DFDs, Flowcharts, and Wireframes** are available inside `/docs` and `/assets`.
 
-- **Visual Routing:** Seeing the distance between scheduled daily activities to ensure realistic planning.
-- **Location-Based Suggestions:** Vega will prioritize suggestions that are geographically convenient to the user's current itinerary slots.
 
-###  3. The "Travel Guardian" Safety Suite
+##  Tech Stack: Hybrid & Scalable
 
-We will add essential features for peace of mind, particularly for families and solo travelers:
+| Component | Technology | Purpose |
+|---------|-----------|---------|
+| **Frontend (Web)** | React + TypeScript | Interactive UI & timeline |
+| **Mobile Core** | Kotlin Multiplatform (KMP) | Shared business logic |
+| **Backend API** | Node.js + TypeScript | Auth, trip management |
+| **AI Service Layer** | FastAPI (Python) | Vega AI inference layer |
+| **AI Engine** | GenAI / LLMs | Context-aware suggestions |
+| **Database** | PostgreSQL | Relational data storage |
+| **Legacy Modules** | Java | Stability & integration |
 
-- **Local Emergency Integration:** Automatically fetching embassy contacts and local emergency numbers based on the destination.
-- **Itinerary Sharing with Live Updates:** Allowing family members to not just see the plan, but receive updates if the itinerary changes.
 
-###  4. Hyper-Personalization via User Knowledge Graph
+## Round-2 Enhancements (Completed)
 
-We will move beyond generic recommendations by building a lightweight knowledge graph for returning users.
+In Round-2, Voyara evolved into an **AI-assisted itinerary builder**.
 
-**Example:** If a user historically books art museums and boutique hotels, Vega will prioritize these categories in future searches implicitly, without needing to be asked.
+### Implemented Features
+- Vega AI assistant integration  
+- Context-aware suggestion engine  
+- Explainable AI responses  
+- Rule-based safety constraints  
+- Stateless & scalable AI architecture  
 
----
+
+## Future Scope
+
+- AI-generated draft itineraries (user-approved)  
+- Interactive maps & distance-based planning  
+- Preference-based personalization  
+- Group itinerary collaboration  
+- Smart travel alerts & reminders  
+
+
+## Documentation & Compliance
+
+- Complete documentation is included in this repository  
+- DFDs, Flowcharts & Wireframes are provided  
+- AI is strictly assistive and non-autonomous  
+- All user actions require explicit confirmation  
+
+Voyara fully complies with hackathon guidelines.
+
 
 <div align="center">
 
