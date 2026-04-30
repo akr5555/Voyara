@@ -8,8 +8,10 @@ services:
       - key: NODE_VERSION
         value: 18.17.0
       - key: VITE_SUPABASE_PROJECT_ID
-        sync: false
+        value: bxjmcjikzpflkdsrqhwb
       - key: VITE_SUPABASE_PUBLISHABLE_KEY
-        sync: false
+        value: sb_publishable_xV2f3OZqTPeiIIGpD0Mn7g_K-kN2HSf
       - key: VITE_SUPABASE_URL
-        sync: false
+        value: https://bxjmcjikzpflkdsrqhwb.supabase.co
+      - key: VITE_VEGA_AI_URL
+        value: https://vegaai-auhl.onrender.com

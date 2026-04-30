@@ -15,6 +15,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
+const vegaAiBaseUrl = import.meta.env.VITE_VEGA_AI_URL || "https://vegaai-auhl.onrender.com";
+
 // Countries data with flags and cities
 const countriesData = [
   { 
@@ -371,7 +373,7 @@ const DayPlanner = () => {
     console.log('📤 Request body:', requestBody);
 
     try {
-      const response = await fetch('https://vegaai-auhl.onrender.com/api/ai/vega/suggest', {
+      const response = await fetch(`${vegaAiBaseUrl}/api/ai/vega/suggest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

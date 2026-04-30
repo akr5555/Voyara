@@ -2,7 +2,7 @@
 -- VOYARA DATABASE SCHEMA - COMPLETE SETUP
 -- =====================================================
 -- Run this in Supabase SQL Editor
--- Project: https://supabase.com/dashboard/project/yrlzcfuubkqdbkwlhjih
+-- Project: https://supabase.com/dashboard/project/bxjmcjikzpflkdsrqhwb
 
 -- =====================================================
 -- 1. DESTINATIONS TABLE

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,6 +8,9 @@ import swaggerSpec from './swagger.js';
 import { supabase } from './supabase.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://bxjmcjikzpflkdsrqhwb.supabase.co';
+const vegaAiUrl = process.env.VITE_VEGA_AI_URL || 'https://vegaai-auhl.onrender.com';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,8 +30,8 @@ app.use((req, res, next) => {
         connectSrc: [
           "'self'",
           "https://*.supabase.co",
-          "https://yrlzcfuubkqdbkwlhjih.supabase.co",
-          "https://vegaai-auhl.onrender.com"
+          supabaseUrl,
+          vegaAiUrl
         ],
         styleSrc: [
           "'self'",

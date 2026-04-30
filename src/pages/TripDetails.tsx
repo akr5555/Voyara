@@ -8,7 +8,6 @@ import Footer from "@/components/Footer";
 import VegaAI from "@/components/VegaAI";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import * as XLSX from 'xlsx';
 
 interface Trip {
   id: string;
@@ -92,7 +91,7 @@ const TripDetails = () => {
     return activities.reduce((sum, activity) => sum + (activity.estimated_cost || 0), 0);
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     if (!trip) return;
 
     // Prepare trip summary
@@ -108,27 +107,29 @@ const TripDetails = () => {
       [],
     ];
 
-    // Prepare activities data
-    const activitiesHeader = ['Day', 'Time of Day', 'Activity', 'Location', 'Estimated Cost', 'Notes'];
-    const activitiesData = activities.map(activity => [
-      activity.day_number,
-      activity.time_of_day,
-      activity.activity_name,
-      activity.location,
-      `$${activity.estimated_cost}`,
-      activity.notes || '',
-    ]);
+    const rows = [
+      ...summary,
+      ['Day', 'Time of Day', 'Activity', 'Location', 'Estimated Cost', 'Notes'],
+      ...activities.map(activity => [
+        activity.day_number,
+        activity.time_of_day,
+        activity.activity_name,
+        activity.location,
+        `$${activity.estimated_cost}`,
+        activity.notes || '',
+      ]),
+    ];
 
-    // Combine all data
-    const worksheetData = [...summary, activitiesHeader, ...activitiesData];
-
-    // Create workbook and worksheet
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Trip Details');
-
-    // Generate file
-    XLSX.writeFile(workbook, `${trip.name.replace(/\s+/g, '_')}_Trip_Plan.xlsx`);
+    const csvContent = rows.map(row => row.map(escapeCsvValue).join(',')).join('\n');
+    const blob = new Blob([csvContent], {
+      type: 'text/csv;charset=utf-8;',
+    });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${trip.name.replace(/\s+/g, '_')}_Trip_Plan.xlsx`;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
 
     toast({
       title: "Success!",
