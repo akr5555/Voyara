@@ -4,6 +4,7 @@ import UpcomingTrips from "@/components/UpcomingTrips";
 import PopularDestinations from "@/components/PopularDestinations";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
+import VegaAI from "@/components/VegaAI";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
           <HeroSlider />
           <UpcomingTrips />
           <PopularDestinations />
+          <VegaAI />
         </main>
         <Footer />
       </div>

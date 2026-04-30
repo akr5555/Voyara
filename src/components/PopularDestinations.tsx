@@ -1,4 +1,15 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const destinations = [
   {
@@ -7,6 +18,8 @@ const destinations = [
     country: "Indonesia",
     image: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80",
     price: "From $899",
+    description: "Golden beaches, jungle temples, and vibrant night markets for a relaxed island escape.",
+    highlights: ["Ubud rice terraces", "Uluwatu cliffs", "Traditional cuisine"],
   },
   {
     id: 2,
@@ -14,6 +27,8 @@ const destinations = [
     country: "Spain",
     image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=600&q=80",
     price: "From $749",
+    description: "Gaudi architecture, seaside promenades, and tapas culture in a city made for strolls.",
+    highlights: ["Sagrada Familia", "Gothic Quarter", "Beachfront cafes"],
   },
   {
     id: 3,
@@ -21,6 +36,8 @@ const destinations = [
     country: "France",
     image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80",
     price: "From $699",
+    description: "Timeless boulevards, art-filled afternoons, and evenings by the Seine.",
+    highlights: ["Louvre museum", "Eiffel Tower views", "Cafe culture"],
   },
   {
     id: 4,
@@ -28,6 +45,8 @@ const destinations = [
     country: "Greece",
     image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=600&q=80",
     price: "From $999",
+    description: "Whitewashed villages, caldera sunsets, and crystal-blue coves.",
+    highlights: ["Oia sunsets", "Volcanic beaches", "Cliffside dining"],
   },
   {
     id: 5,
@@ -35,6 +54,8 @@ const destinations = [
     country: "Maldives",
     image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=80",
     price: "From $1,299",
+    description: "Overwater villas and turquoise lagoons for the ultimate slow-travel reset.",
+    highlights: ["Reef snorkeling", "Private sandbanks", "Spa rituals"],
   },
   {
     id: 6,
@@ -42,6 +63,8 @@ const destinations = [
     country: "Japan",
     image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600&q=80",
     price: "From $1,099",
+    description: "Neon nights, serene shrines, and world-class cuisine across every district.",
+    highlights: ["Shibuya crossing", "Sushi tastings", "Ancient temples"],
   },
   {
     id: 7,
@@ -49,6 +72,8 @@ const destinations = [
     country: "USA",
     image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=600&q=80",
     price: "From $599",
+    description: "Iconic skylines, Broadway nights, and neighborhoods that never slow down.",
+    highlights: ["Central Park", "Broadway shows", "Soho galleries"],
   },
   {
     id: 8,
@@ -56,10 +81,37 @@ const destinations = [
     country: "UAE",
     image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80",
     price: "From $849",
+    description: "Desert adventures, futuristic skylines, and world-class shopping.",
+    highlights: ["Desert safari", "Marina skyline", "Sky-high dining"],
   },
 ];
 
 const PopularDestinations = () => {
+  const navigate = useNavigate();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [favorites, setFavorites] = useState<number[]>([]);
+
+  const selectedDestination = destinations.find((destination) => destination.id === selectedId) || null;
+
+  const toggleFavorite = (id: number) => {
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
+  };
+
+  const handlePlanTrip = () => {
+    if (!selectedDestination) return;
+
+    navigate("/create-trip", {
+      state: {
+        prefill: {
+          name: `${selectedDestination.name}, ${selectedDestination.country}`,
+          description: selectedDestination.description,
+          cover_image_url: selectedDestination.image,
+        },
+      },
+    });
+    setSelectedId(null);
+  };
+
   return (
     <section id="destinations" className="relative py-20 lg:py-32 overflow-hidden"
       style={{
@@ -102,6 +154,7 @@ const PopularDestinations = () => {
               key={destination.id}
               className="group relative overflow-hidden rounded-2xl md:rounded-3xl aspect-[3/4] cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-500"
               style={{ animationDelay: `${index * 100}ms` }}
+              onClick={() => setSelectedId(destination.id)}
             >
               {/* Image */}
               <img
@@ -113,11 +166,18 @@ const PopularDestinations = () => {
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               
-              {/* Close button */}
-              <button className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white/90 flex items-center justify-center text-gray-800 hover:bg-white transition-colors z-10">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              {/* Favorite button */}
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleFavorite(destination.id);
+                }}
+                className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-gray-800 hover:bg-white transition-colors z-10"
+                aria-pressed={favorites.includes(destination.id)}
+                aria-label={favorites.includes(destination.id) ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Heart className={favorites.includes(destination.id) ? "w-4 h-4 text-rose-500 fill-rose-500" : "w-4 h-4"} />
               </button>
               
               {/* Content */}
@@ -130,7 +190,13 @@ const PopularDestinations = () => {
 
                 {/* Hover Button */}
                 <div className="mt-4 transform translate-y-8 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                  <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-2 text-sm font-medium shadow-lg">
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-2 text-sm font-medium shadow-lg"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedId(destination.id);
+                    }}
+                  >
                     View Place
                   </Button>
                 </div>
@@ -139,6 +205,57 @@ const PopularDestinations = () => {
           ))}
         </div>
       </div>
+
+      <Dialog open={selectedId !== null} onOpenChange={(open) => setSelectedId(open ? selectedId : null)}>
+        {selectedDestination && (
+          <DialogContent className="max-w-2xl p-0 overflow-hidden">
+            <div className="grid md:grid-cols-[1.1fr_0.9fr]">
+              <div className="relative h-64 md:h-full">
+                <img
+                  src={selectedDestination.image}
+                  alt={selectedDestination.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+              </div>
+              <div className="p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl font-display font-bold">
+                    {selectedDestination.name}, {selectedDestination.country}
+                  </DialogTitle>
+                  <DialogDescription className="text-base text-gray-600">
+                    {selectedDestination.description}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="mt-4">
+                  <p className="text-sm uppercase tracking-[0.2em] text-gray-500">Highlights</p>
+                  <ul className="mt-3 space-y-2 text-sm text-gray-700">
+                    {selectedDestination.highlights.map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-blue-600" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <DialogFooter className="mt-6">
+                  <div className="flex items-center justify-between w-full">
+                    <span className="text-lg font-semibold text-gray-900">{selectedDestination.price}</span>
+                    <Button
+                      className="bg-gray-900 text-white hover:bg-gray-800"
+                      onClick={handlePlanTrip}
+                    >
+                      Plan this trip
+                    </Button>
+                  </div>
+                </DialogFooter>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </section>
   );
 };

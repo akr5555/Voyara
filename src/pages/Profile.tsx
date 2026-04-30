@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -32,6 +32,7 @@ const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
   const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: Record<string, unknown> } | null>(null);
   const [profile, setProfile] = useState({
     full_name: "",
@@ -39,6 +40,7 @@ const Profile = () => {
     avatar_url: "",
     language: "en"
   });
+  const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
   const fetchUserProfile = useCallback(async () => {
     try {
@@ -128,6 +130,8 @@ const Profile = () => {
         title: "Success!",
         description: "Your profile has been updated."
       });
+
+      setIsEditing(false);
     } catch (error: unknown) {
       console.error('🚨 Save error:', error);
       
@@ -173,6 +177,27 @@ const Profile = () => {
     }
   };
 
+  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({
+        variant: "destructive",
+        title: "Invalid file",
+        description: "Please select an image file."
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === "string" ? reader.result : "";
+      setProfile((prev) => ({ ...prev, avatar_url: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-secondary/30 flex items-center justify-center">
@@ -216,131 +241,203 @@ const Profile = () => {
             <p className="text-slate-600 text-base sm:text-lg font-medium px-4">Customize your travel experience</p>
           </div>
 
-          {/* Profile Card */}
-          <Card className="mb-4 sm:mb-6 bg-white shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"></div>
-            <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100 px-4 sm:px-6 py-4 sm:py-6">
-              <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl text-slate-800">
-                <div className="p-1.5 sm:p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
-                  <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                </div>
-                Personal Information
-              </CardTitle>
-              <CardDescription className="text-sm sm:text-base text-slate-600">Update your profile details and make your mark</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 sm:py-6">
-              {/* Avatar Section */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                <div className="relative group">
+          {!isEditing ? (
+            <Card className="mb-4 sm:mb-6 bg-white shadow-2xl border border-slate-200 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"></div>
+              <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100 px-4 sm:px-6 py-4 sm:py-6">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl text-slate-800">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
+                    <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  Saved Profile
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base text-slate-600">Your latest profile details are saved</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 sm:py-6">
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
                   <Avatar className="w-24 h-24 sm:w-28 sm:h-28 border-4 border-white shadow-xl ring-4 ring-blue-500/20">
                     <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
                     <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-blue-600 text-white text-2xl sm:text-3xl font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                  <div className="flex-1 w-full space-y-2">
+                    <div>
+                      <p className="text-sm text-slate-500">Full Name</p>
+                      <p className="text-lg font-semibold text-slate-900">{profile.full_name || "-"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-500">Email</p>
+                      <p className="text-sm text-slate-700">{user?.email || "-"}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex-1 w-full">
-                  <Label htmlFor="avatar_url" className="text-sm font-semibold text-slate-700">Avatar URL</Label>
-                  <div className="flex gap-2 mt-2">
-                    <Input
-                      id="avatar_url"
-                      placeholder="https://example.com/avatar.jpg"
-                      value={profile.avatar_url}
-                      onChange={(e) => setProfile({ ...profile, avatar_url: e.target.value })}
-                      className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base"
-                    />
-                    <Button variant="outline" size="icon" className="border-indigo-300 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all flex-shrink-0">
-                      <Camera className="w-4 h-4" />
-                    </Button>
+
+                <Separator className="bg-slate-200" />
+
+                <div className="grid gap-4">
+                  <div>
+                    <p className="text-sm text-slate-500">Bio</p>
+                    <p className="text-sm text-slate-700">{profile.bio || "No bio yet."}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-slate-500">Preferred Language</p>
+                    <p className="text-sm text-slate-700">{profile.language || "-"}</p>
                   </div>
                 </div>
-              </div>
 
-              <Separator className="bg-slate-200" />
-
-              {/* Email (Read-only) */}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <Mail className="w-4 h-4 text-slate-600" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={user?.email || ''}
-                  disabled
-                  className="bg-slate-100 border-slate-300 text-slate-700 text-sm sm:text-base"
-                />
-                <p className="text-xs sm:text-sm text-slate-500">Email cannot be changed</p>
-              </div>
-
-              {/* Full Name */}
-              <div className="space-y-2">
-                <Label htmlFor="full_name" className="text-sm font-semibold text-slate-700">Full Name</Label>
-                <Input
-                  id="full_name"
-                  placeholder="John Doe"
-                  value={profile.full_name}
-                  onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base"
-                />
-              </div>
-
-              {/* Bio */}
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="text-sm font-semibold text-slate-700">Bio</Label>
-                <Textarea
-                  id="bio"
-                  placeholder="Tell us about yourself..."
-                  value={profile.bio}
-                  onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-                  rows={4}
-                  className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base resize-none"
-                />
-              </div>
-
-              {/* Language Preference */}
-              <div className="space-y-2">
-                <Label htmlFor="language" className="text-sm font-semibold text-slate-700">Preferred Language</Label>
-                <select
-                  id="language"
-                  value={profile.language}
-                  onChange={(e) => setProfile({ ...profile, language: e.target.value })}
-                  className="w-full h-10 sm:h-11 rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                <Button
+                  type="button"
+                  onClick={() => setIsEditing(true)}
+                  className="w-full bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg h-11 sm:h-12 text-sm sm:text-base"
                 >
-                  <option value="en">English</option>
-                  <option value="es">Español</option>
-                  <option value="fr">Français</option>
-                  <option value="de">Deutsch</option>
-                  <option value="it">Italiano</option>
-                  <option value="ja">日本語</option>
-                </select>
-              </div>
+                  Edit Profile
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="mb-4 sm:mb-6 bg-white shadow-2xl border border-slate-200 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500"></div>
+              <CardHeader className="bg-gradient-to-br from-slate-50 to-blue-50/50 border-b border-slate-100 px-4 sm:px-6 py-4 sm:py-6">
+                <CardTitle className="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl text-slate-800">
+                  <div className="p-1.5 sm:p-2 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl shadow-lg">
+                    <User className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  </div>
+                  Personal Information
+                </CardTitle>
+                <CardDescription className="text-sm sm:text-base text-slate-600">Update your profile details and make your mark</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6 py-4 sm:py-6">
+                {/* Avatar Section */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 p-4 sm:p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                  <div className="relative group">
+                    <Avatar className="w-24 h-24 sm:w-28 sm:h-28 border-4 border-white shadow-xl ring-4 ring-blue-500/20">
+                      <AvatarImage src={profile.avatar_url} alt={profile.full_name} />
+                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-blue-600 text-white text-2xl sm:text-3xl font-bold">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1 w-full">
+                    <Label htmlFor="avatar_file" className="text-sm font-semibold text-slate-700">Upload Profile Photo</Label>
+                    <div className="flex flex-col sm:flex-row gap-2 mt-2">
+                      <Input
+                        ref={avatarInputRef}
+                        id="avatar_file"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarUpload}
+                        className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base file:mr-4 file:rounded-md file:border-0 file:bg-indigo-600 file:px-4 file:py-2 file:text-white hover:file:bg-indigo-700"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="border-indigo-300 hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all"
+                        onClick={() => avatarInputRef.current?.click()}
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        Choose Photo
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-              {/* Save Button */}
-              <Button
-                onClick={handleSave}
-                disabled={saving}
-                className="w-full bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg h-11 sm:h-12 text-sm sm:text-base"
-                size="lg"
-              >
-                {saving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
-                    Saving Your Changes...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+                <Separator className="bg-slate-200" />
+
+                {/* Email (Read-only) */}
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <Mail className="w-4 h-4 text-slate-600" />
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={user?.email || ''}
+                    disabled
+                    className="bg-slate-100 border-slate-300 text-slate-700 text-sm sm:text-base"
+                  />
+                  <p className="text-xs sm:text-sm text-slate-500">Email cannot be changed</p>
+                </div>
+
+                {/* Full Name */}
+                <div className="space-y-2">
+                  <Label htmlFor="full_name" className="text-sm font-semibold text-slate-700">Full Name</Label>
+                  <Input
+                    id="full_name"
+                    placeholder="John Doe"
+                    value={profile.full_name}
+                    onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
+                    className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base"
+                  />
+                </div>
+
+                {/* Bio */}
+                <div className="space-y-2">
+                  <Label htmlFor="bio" className="text-sm font-semibold text-slate-700">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    placeholder="Tell us about yourself..."
+                    value={profile.bio}
+                    onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
+                    rows={4}
+                    className="border-slate-300 focus:border-indigo-500 focus:ring-indigo-500/20 bg-white text-slate-900 text-sm sm:text-base resize-none"
+                  />
+                </div>
+
+                {/* Language Preference */}
+                <div className="space-y-2">
+                  <Label htmlFor="language" className="text-sm font-semibold text-slate-700">Preferred Language</Label>
+                  <select
+                    id="language"
+                    value={profile.language}
+                    onChange={(e) => setProfile({ ...profile, language: e.target.value })}
+                    className="w-full h-10 sm:h-11 rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-900 text-sm sm:text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                  >
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="fr">Français</option>
+                    <option value="de">Deutsch</option>
+                    <option value="it">Italiano</option>
+                    <option value="ja">日本語</option>
+                  </select>
+                </div>
+
+                {/* Save Button */}
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    onClick={() => setIsEditing(false)}
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:flex-1 border-2 border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all h-11 sm:h-12 text-sm sm:text-base"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="w-full sm:flex-1 bg-gradient-to-r from-indigo-600 via-blue-600 to-purple-600 hover:shadow-2xl transform hover:scale-[1.02] transition-all duration-200 text-white font-semibold shadow-lg h-11 sm:h-12 text-sm sm:text-base"
+                    size="lg"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 mr-2 animate-spin" />
+                        Saving Your Changes...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Account Actions */}
           <Card className="bg-white shadow-2xl border border-slate-200 overflow-hidden">

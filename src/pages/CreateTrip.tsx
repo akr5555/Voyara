@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,10 @@ import Footer from "@/components/Footer";
 
 const CreateTrip = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [creating, setCreating] = useState(false);
+  const hasPrefilled = useRef(false);
   const [tripData, setTripData] = useState({
     name: "",
     description: "",
@@ -26,6 +28,29 @@ const CreateTrip = () => {
     end_date: undefined as Date | undefined,
     cover_image_url: ""
   });
+
+  useEffect(() => {
+    if (hasPrefilled.current) return;
+
+    const state = location.state as {
+      prefill?: {
+        name?: string;
+        description?: string;
+        cover_image_url?: string;
+      };
+    } | null;
+
+    if (!state?.prefill) return;
+
+    setTripData((prev) => ({
+      ...prev,
+      name: state.prefill?.name ?? prev.name,
+      description: state.prefill?.description ?? prev.description,
+      cover_image_url: state.prefill?.cover_image_url ?? prev.cover_image_url,
+    }));
+
+    hasPrefilled.current = true;
+  }, [location.state]);
 
   const handleCreateTrip = async () => {
     // Validation

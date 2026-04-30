@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 
 const slides = [
   {
@@ -29,32 +31,65 @@ const slides = [
 ];
 
 const HeroSlider = () => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isDragging, setIsDragging] = useState(false);
   const [startPos, setStartPos] = useState(0);
   const [currentTranslate, setCurrentTranslate] = useState(0);
   const [dragStartTime, setDragStartTime] = useState(0);
+  const [slideShift, setSlideShift] = useState(0);
+
+  const triggerSlideShift = useCallback((direction: "next" | "prev") => {
+    const shiftAmount = direction === "next" ? -24 : 24;
+    setSlideShift(shiftAmount);
+    window.setTimeout(() => setSlideShift(0), 320);
+  }, []);
 
   const nextSlide = useCallback(() => {
+    triggerSlideShift("next");
     setCurrentSlide((prev) => (prev + 1) % slides.length);
-  }, []);
+  }, [triggerSlideShift]);
 
   const prevSlide = useCallback(() => {
+    triggerSlideShift("prev");
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  }, []);
+  }, [triggerSlideShift]);
 
   useEffect(() => {
     if (!isAutoPlaying) return;
-    const interval = setInterval(nextSlide, 5000);
+    const interval = setInterval(nextSlide, 2000);
     return () => clearInterval(interval);
   }, [isAutoPlaying, nextSlide]);
+
+  const handleImageClick = () => {
+    navigate("/create-trip");
+  };
 
   const handleManualNavigation = (direction: "next" | "prev") => {
     setIsAutoPlaying(false);
     if (direction === "next") nextSlide();
     else prevSlide();
     setTimeout(() => setIsAutoPlaying(true), 10000);
+  };
+
+  const toggleAutoplay = () => {
+    setIsAutoPlaying((prev) => !prev);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      handleManualNavigation("prev");
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      handleManualNavigation("next");
+    }
+    if (event.key === " " || event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      toggleAutoplay();
+    }
   };
 
   // Drag/Swipe handlers
@@ -135,7 +170,11 @@ const HeroSlider = () => {
   };
 
   return (
-    <section id="home" className="relative min-h-[70vh] flex items-center justify-center pt-20 pb-12 overflow-hidden"
+    <section
+      id="home"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      className="relative min-h-[70vh] flex items-center justify-center pt-20 pb-12 overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-blue-600/60"
       style={{
         background: 'linear-gradient(135deg, #E8A587 0%, #F4C4B4 50%, #E8A587 100%)',
       }}
@@ -179,8 +218,10 @@ const HeroSlider = () => {
         {/* Layered Carousel Container - Fixed glitches */}
         <div className="relative max-w-7xl mx-auto h-[280px] md:h-[360px] flex items-center justify-center touch-pan-y">
           <div 
-            className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none touch-none" 
+            className="relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing select-none touch-none"
             style={{ 
+              transform: `translateX(${currentTranslate + slideShift}px)` ,
+              transition: isDragging ? "none" : "transform 600ms cubic-bezier(0.22, 1, 0.36, 1)",
               perspective: '2500px',
               WebkitTouchCallout: 'none',
               WebkitUserSelect: 'none',
@@ -196,7 +237,7 @@ const HeroSlider = () => {
           >
             {/* Background layers - Left side cards - HIDDEN behind center */}
             <div 
-              className="absolute left-[2%] md:left-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[1]"
+              className="absolute left-[2%] md:left-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-out z-[1] cursor-pointer"
               style={{
                 transform: 'translate3d(0, -50%, -80px) rotateY(18deg) scale(0.82)',
                 transformOrigin: 'center center',
@@ -204,6 +245,10 @@ const HeroSlider = () => {
                 filter: 'blur(2.5px)',
                 willChange: 'transform, opacity',
               }}
+              role="button"
+              tabIndex={-1}
+              onClick={handleImageClick}
+              aria-label="Create a new trip"
             >
               <img
                 src={slides[getSlideIndex(-2)].image}
@@ -215,7 +260,7 @@ const HeroSlider = () => {
             </div>
 
             <div 
-              className="absolute left-[12%] md:left-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[5]"
+              className="absolute left-[12%] md:left-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-out z-[5] cursor-pointer"
               style={{
                 transform: 'translate3d(0, -50%, -40px) rotateY(10deg) scale(0.90)',
                 transformOrigin: 'center center',
@@ -223,6 +268,10 @@ const HeroSlider = () => {
                 filter: 'blur(1px)',
                 willChange: 'transform, opacity',
               }}
+              role="button"
+              tabIndex={-1}
+              onClick={handleImageClick}
+              aria-label="Create a new trip"
             >
               <img
                 src={slides[getSlideIndex(-1)].image}
@@ -235,7 +284,7 @@ const HeroSlider = () => {
 
             {/* Center - Main active slide - HIGHEST z-index - WIDER */}
             <div 
-              className="absolute left-1/2 top-1/2 w-[260px] md:w-[480px] h-[240px] md:h-[320px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[10]"
+              className="absolute left-1/2 top-1/2 w-[260px] md:w-[480px] h-[240px] md:h-[320px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-out z-[10] cursor-pointer"
               style={{
                 transform: 'translate3d(-50%, -50%, 0) rotateY(0deg) scale(1)',
                 transformOrigin: 'center center',
@@ -243,6 +292,10 @@ const HeroSlider = () => {
                 filter: 'blur(0px)',
                 willChange: 'transform, opacity',
               }}
+              role="button"
+              tabIndex={-1}
+              onClick={handleImageClick}
+              aria-label="Create a new trip"
             >
               <img
                 src={slides[currentSlide].image}
@@ -255,7 +308,7 @@ const HeroSlider = () => {
 
             {/* Background layers - Right side cards - HIDDEN behind center */}
             <div 
-              className="absolute right-[12%] md:right-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[5]"
+              className="absolute right-[12%] md:right-[18%] top-1/2 w-[220px] md:w-[380px] h-[220px] md:h-[300px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-out z-[5] cursor-pointer"
               style={{
                 transform: 'translate3d(0, -50%, -40px) rotateY(-10deg) scale(0.90)',
                 transformOrigin: 'center center',
@@ -263,6 +316,10 @@ const HeroSlider = () => {
                 filter: 'blur(1px)',
                 willChange: 'transform, opacity',
               }}
+              role="button"
+              tabIndex={-1}
+              onClick={handleImageClick}
+              aria-label="Create a new trip"
             >
               <img
                 src={slides[getSlideIndex(1)].image}
@@ -274,7 +331,7 @@ const HeroSlider = () => {
             </div>
 
             <div 
-              className="absolute right-[2%] md:right-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 ease-out z-[1]"
+              className="absolute right-[2%] md:right-[5%] top-1/2 w-[180px] md:w-[320px] h-[200px] md:h-[280px] rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl transition-all duration-700 ease-out z-[1] cursor-pointer"
               style={{
                 transform: 'translate3d(0, -50%, -80px) rotateY(-18deg) scale(0.82)',
                 transformOrigin: 'center center',
@@ -282,6 +339,10 @@ const HeroSlider = () => {
                 filter: 'blur(2.5px)',
                 willChange: 'transform, opacity',
               }}
+              role="button"
+              tabIndex={-1}
+              onClick={handleImageClick}
+              aria-label="Create a new trip"
             >
               <img
                 src={slides[getSlideIndex(2)].image}
@@ -291,6 +352,34 @@ const HeroSlider = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-l from-black/40 to-transparent" />
             </div>
+          </div>
+
+          {/* Slider Controls */}
+          <div className="absolute inset-x-0 bottom-2 md:bottom-4 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => handleManualNavigation("prev")}
+              className="w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-lg flex items-center justify-center transition-colors"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={toggleAutoplay}
+              className="w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-lg flex items-center justify-center transition-colors"
+              aria-label={isAutoPlaying ? "Pause slideshow" : "Play slideshow"}
+            >
+              {isAutoPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleManualNavigation("next")}
+              className="w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-900 shadow-lg flex items-center justify-center transition-colors"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
 

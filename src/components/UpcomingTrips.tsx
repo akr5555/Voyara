@@ -1,6 +1,8 @@
-import { Calendar, MapPin, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { format, isValid, parse } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const trips = [
   {
@@ -11,6 +13,8 @@ const trips = [
     description: "The European adventure is a multi-city trip designed to explore famous destinations, cultural attractions, and local experiences. The journey includes planned activities, travel itineraries, and cost breakdowns for easy and stress-free travel.",
     image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80",
     imagePosition: "right",
+    highlights: ["Paris, Rome, and Barcelona", "Guided museum tours", "Flexible day plans"],
+    duration: "15 days",
   },
   {
     id: 2,
@@ -20,10 +24,95 @@ const trips = [
     description: "A cultural and modern exploration of Tokyo's ancient temples, cutting-edge technology, cuisine, and iconic neighborhoods. The plan includes scheduled activities, travel details, and estimated costs for a smooth and organized exploration.",
     image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
     imagePosition: "left",
+    highlights: ["Tsukiji food tour", "Mount Fuji day trip", "Shibuya nightlife"],
+    duration: "10 days",
   },
 ];
 
 const UpcomingTrips = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [expandedTripId, setExpandedTripId] = useState<number | null>(null);
+  const [savingTripId, setSavingTripId] = useState<number | null>(null);
+
+  const toggleTrip = (id: number) => {
+    setExpandedTripId((prev) => (prev === id ? null : id));
+  };
+
+  const parseTripDates = (dateRange: string) => {
+    const [rangePart, yearPart] = dateRange.split(",");
+    const year = yearPart?.trim();
+    const [startPart, endPart] = rangePart.split("-").map((part) => part.trim());
+
+    if (!year || !startPart || !endPart) {
+      return { start: null, end: null };
+    }
+
+    const start = parse(`${startPart} ${year}`, "MMM d yyyy", new Date());
+    const end = parse(`${endPart} ${year}`, "MMM d yyyy", new Date());
+
+    return {
+      start: isValid(start) ? start : null,
+      end: isValid(end) ? end : null,
+    };
+  };
+
+  const handleSaveTrip = async (trip: (typeof trips)[number]) => {
+    if (savingTripId) return;
+
+    const { start, end } = parseTripDates(trip.date);
+
+    if (!start || !end) {
+      toast({
+        variant: "destructive",
+        title: "Date Error",
+        description: "Unable to parse trip dates. Please try again.",
+      });
+      return;
+    }
+
+    try {
+      setSavingTripId(trip.id);
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !user) {
+        navigate("/auth");
+        return;
+      }
+
+      const tripInsertData = {
+        user_id: user.id,
+        name: trip.title,
+        description: trip.description,
+        start_date: format(start, "yyyy-MM-dd"),
+        end_date: format(end, "yyyy-MM-dd"),
+        cover_image_url: trip.image,
+        status: "planning",
+      };
+
+      const { error } = await supabase
+        .from("trips")
+        .insert([tripInsertData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Trip Saved",
+        description: "Your trip has been added to My Trips.",
+      });
+
+      navigate("/my-trips");
+    } catch (error: unknown) {
+      toast({
+        variant: "destructive",
+        title: "Save Failed",
+        description: error instanceof Error ? error.message : "Unable to save trip.",
+      });
+    } finally {
+      setSavingTripId(null);
+    }
+  };
+
   return (
     <section id="trips" className="relative py-12 lg:py-16 overflow-hidden"
       style={{
@@ -50,7 +139,7 @@ const UpcomingTrips = () => {
               }`}></div>
               
               {/* Main Card - ABOVE the border, TOUCHING EDGES - MORE TRANSPARENT */}
-              <div className={`relative z-10 bg-white/50 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden max-w-5xl ${
+              <div className={`relative z-10 bg-white/60 backdrop-blur-md rounded-2xl shadow-[0_18px_45px_rgba(15,23,42,0.18)] hover:shadow-[0_28px_65px_rgba(15,23,42,0.25)] overflow-hidden max-w-5xl transition-transform duration-500 ease-out hover:-translate-y-2 ${
                 index === 0 ? "ml-auto" : "mr-auto"
               }`}>
                 <div className={`grid grid-cols-1 md:grid-cols-2 ${
@@ -76,14 +165,45 @@ const UpcomingTrips = () => {
                     {/* Description */}
                     <div className="flex-1 mb-5">
                       <p className="text-gray-600 text-sm leading-relaxed">
-                        {trip.description}
+                        {expandedTripId === trip.id
+                          ? trip.description
+                          : `${trip.description.slice(0, 140)}...`}
                       </p>
+
+                      <div
+                        className={`mt-4 space-y-3 transition-all duration-300 ${
+                          expandedTripId === trip.id ? "max-h-64 opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+                        }`}
+                      >
+                        <div className="flex flex-wrap gap-2">
+                          {trip.highlights.map((item) => (
+                            <span key={item} className="rounded-full bg-gray-900/10 px-3 py-1 text-xs text-gray-700">
+                              {item}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="text-sm text-gray-700">
+                          <span className="font-semibold">Duration:</span> {trip.duration}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Button Section */}
-                    <div>
-                      <button className="px-6 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition-colors duration-200">
-                        View Details
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleTrip(trip.id)}
+                        className="px-6 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-md hover:bg-gray-800 transition-colors duration-200"
+                      >
+                        {expandedTripId === trip.id ? "Hide Details" : "View Details"}
+                      </button>
+                      <button
+                        type="button"
+                        className="px-6 py-2.5 border border-gray-900 text-gray-900 text-sm font-semibold rounded-md hover:bg-gray-900 hover:text-white transition-colors duration-200"
+                        onClick={() => handleSaveTrip(trip)}
+                        disabled={savingTripId === trip.id}
+                      >
+                        {savingTripId === trip.id ? "Saving..." : "Save Trip"}
                       </button>
                     </div>
                   </div>
