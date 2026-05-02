@@ -5,16 +5,19 @@
 
 > *Experience the world your way. Plan the journey, not just the bookings.*
 
+[![Live Demo](https://img.shields.io/badge/Live-voyara.onrender.com-blue?style=for-the-badge)](https://voyara.onrender.com)
+[![API Docs](https://img.shields.io/badge/API_Docs-Swagger_UI-green?style=for-the-badge)](https://voyara.onrender.com/api-docs)
+[![Mobile App](https://img.shields.io/badge/Mobile-Kotlin_KMP-purple?style=for-the-badge)](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)
+
 </div>
 
+---
 
-##  The Vision: Revolutionizing Travel Planning
+##  The Vision
 
-Currently, travel planning is a fragmented, stressful mess of open tabs—flights here, hotels there, and generic "top 10 things to do" lists that offer no real local insight. Most platforms stop once the flight is booked.
+Travel planning is a fragmented, stressful mess of open tabs — flights here, hotels there, and generic "top 10 things to do" lists that offer no real local insight. Most platforms stop once the flight is booked.
 
-**Voyara changes the paradigm.** We are not just another booking engine; we are an intelligent, interactive platform that acts as your **personal local tour guide** for unknown cities.
-
-Voyara is an **itinerary builder** that gamifies the entire planning process, taking users from an initial travel idea to a **fully structured, day-wise, budgeted, and actionable itinerary**. Our core mission is to surface local activities and meaningful experiences and integrate them seamlessly into a single planning flow.
+**Voyara changes the paradigm.** We are an intelligent, interactive platform that acts as your **personal local tour guide** for unknown cities. Voyara is an **itinerary builder** that takes users from an initial travel idea to a **fully structured, day-wise, budgeted, and actionable itinerary**, surfacing local activities and meaningful experiences in a single planning flow.
 
 
 ## Problem Statement
@@ -26,13 +29,7 @@ Travel planning today is highly fragmented. Users depend on multiple platforms f
 - Budget planning  
 - Daily scheduling  
 
-This results in:
-- Disorganized plans  
-- No clear day-wise execution  
-- Poor budget visibility  
-- Generic tourist experiences  
-
-Most platforms stop at bookings and fail to support the **actual travel experience**.
+This results in disorganized plans, no clear day-wise execution, poor budget visibility, and generic tourist experiences. Most platforms stop at bookings and fail to support the **actual travel experience**.
 
 
 ## Proposed Solution
@@ -47,16 +44,51 @@ Voyara enables users to:
 
 ---
 
-##  Live Demo, Mobile App & Resources
+## 🚀 Getting Started
 
-###  **[Click Here to Launch Voyara Web Live](https://voyara.onrender.com)**
+### Prerequisites
 
-### 🎥 Demo Video  
-**[Demo Video – Voyara Walkthrough](./assets/Voyara_video.mp4)**
+- [Node.js](https://nodejs.org/) v18+ 
+- npm (comes with Node.js)
+- A [Supabase](https://supabase.com/) project (free tier works)
 
-###  **[Click Here to View Mobile App Repository](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)**
-*Native mobile app built using **Kotlin Multiplatform (KMP)**.*
+### Installation
 
+```bash
+# 1. Clone the repository
+git clone https://github.com/NitishChoubey/Voyara_FSD.git
+cd Voyara_FSD
+
+# 2. Install dependencies
+npm install
+
+# 3. Set up environment variables
+cp .env.example .env
+# Edit .env and fill in your Supabase credentials and Vega AI URL
+```
+
+### Running Locally
+
+```bash
+# Start the frontend dev server (hot-reload)
+npm run dev
+# → Opens at http://localhost:8080
+##  Live Demo && Resources
+
+# In a separate terminal, start the backend API server
+npm run server
+# → API at http://localhost:10000
+# → Swagger UI at http://localhost:10000/api-docs
+```
+
+### Production Build
+
+```bash
+npm run build    # Build the React frontend
+npm start        # Serve frontend + API from a single Express server
+```
+
+### Environment Variables
 ###  Technical Documentation
 Detailed system documentation is organized inside the repository:
 - **[Docs Folder](./docs/)**
@@ -68,11 +100,72 @@ Detailed system documentation is organized inside the repository:
   - Database Schema
   - UI Wireframes
 
-##  Key Differentiators (Why Voyara)
+See [`.env.example`](./.env.example) for all required variables:
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Supabase anon/public key |
+| `VITE_VEGA_AI_URL` | URL of the Vega AI FastAPI service |
+| `PORT` | Express server port (default: `10000`) |
+
+---
+
+## 📁 Project Structure
+
+```
+Voyara_FSD/
+├── public/                  # Static assets (favicon, logo, loading screen)
+├── server/                  # Express.js backend
+│   ├── index.js             # API routes (auth, trips, destinations, profile)
+│   ├── supabase.js          # Supabase client for server-side
+│   └── swagger.js           # Swagger/OpenAPI configuration
+├── src/                     # React frontend (Vite + TypeScript)
+│   ├── components/          # Reusable UI components
+│   │   ├── ui/              # shadcn/ui primitives
+│   │   ├── Header.tsx       # Navigation header
+│   │   ├── Footer.tsx       # Site footer
+│   │   ├── HeroSlider.tsx   # Landing page hero carousel
+│   │   ├── VegaAI.tsx       # Vega AI chat assistant
+│   │   └── ProtectedRoute.tsx  # Auth route guard
+│   ├── contexts/            # React context providers
+│   │   └── AuthContext.tsx   # Centralized auth state
+│   ├── hooks/               # Custom React hooks
+│   ├── integrations/        # Supabase client & types
+│   ├── pages/               # Route-level page components
+│   │   ├── Index.tsx        # Landing / Home page
+│   │   ├── Auth.tsx         # Login & Signup
+│   │   ├── CreateTrip.tsx   # New trip creation form
+│   │   ├── MyTrips.tsx      # Trip listing dashboard
+│   │   ├── TripDetails.tsx  # Single trip view
+│   │   ├── DayPlanner.tsx   # Day-wise itinerary planner + Vega AI
+│   │   └── Profile.tsx      # User profile & settings
+│   └── lib/                 # Utility functions
+├── supabase/                # Supabase migrations
+├── docs/                    # Flowcharts, wireframes, DFDs
+├── assets/                  # Design assets & demo video
+└── render.yaml              # Render deployment config
+```
+
+---
+
+## 🎥 Demo & Resources
+
+- **[Live Web App →](https://voyara.onrender.com)**
+- **[Demo Video →](./assets/Voyara_video.mp4)**
+- **[API Documentation (Swagger UI) →](https://voyara.onrender.com/api-docs)**
+- **[Mobile App Repository (Kotlin KMP) →](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform)**
+- **Technical Docs:**
+  - [Flowchart & Architecture](./docs/FLOWCHART.md)
+  - [Wireframes & DFDs](./docs/WIREFRAME_AND_DFD.md)
+
+---
+
+##  Key Differentiators
 
 Voyara solves the hardest part of travel:
 
-> **“What do I do when I get there?”**
+> **"What do I do when I get there?"**
 
 ###  1. Interactive Journey Timeline
 
@@ -106,13 +199,13 @@ Voyara prioritizes **local activities and experiences** instead of generic touri
 **Impact:** Users explore cities like locals, not checklist tourists.
 
 
-###  3. Vega – Context-Aware AI Assistant (Round-2 Feature)
+###  3. Vega – Context-Aware AI Assistant
 
-Vega is Voyara’s intelligent **assistive AI** that helps users plan better without taking control away.
+Vega is Voyara's intelligent **assistive AI** that helps users plan better without taking control away.
 
 #### Design Principles
 - User-in-the-loop (no autonomous actions)  
-- Suggest, don’t decide  
+- Suggest, don't decide  
 - Context-aware recommendations  
 - Explainable reasoning  
 - Fail-safe fallback  
@@ -128,12 +221,12 @@ Vega is Voyara’s intelligent **assistive AI** that helps users plan better wit
 - Trigger background actions  
 - Write to databases  
 
-Vega fully complies with hackathon AI rules and remains **strictly assistive**.
+Vega remains **strictly assistive** — all suggestions require explicit user approval.
 
 
 ###  4. One-Click Budget Export
 
-Voyara converts the entire itinerary into a structured **Excel budget sheet**, including:
+Voyara converts the entire itinerary into a structured **budget sheet**, including:
 - Transport costs  
 - Activity costs  
 - Daily breakdown  
@@ -141,41 +234,33 @@ Voyara converts the entire itinerary into a structured **Excel budget sheet**, i
 **Impact:** Offline-ready and practical for real travel use.
 
 
+---
+
+##  Tech Stack
+
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Frontend** | React + TypeScript + Vite | Interactive UI & timeline |
+| **UI Library** | shadcn/ui + Tailwind CSS | Component system & styling |
+| **State Management** | TanStack React Query | Server state & caching |
+| **Backend API** | Node.js + Express | REST API, auth, trip management |
+| **AI Service** | FastAPI (Python) | Vega AI inference layer |
+| **AI Engine** | GenAI / LLMs | Context-aware suggestions |
+| **Database** | PostgreSQL (Supabase) | Relational data + auth + RLS |
+| **Deployment** | Render | Web service hosting |
+| **Mobile** | Kotlin Multiplatform (KMP) | [Separate repo](https://github.com/NitishChoubey/Voyara-Mobile-App-Platform) |
+
+
 ## Data Flow & System Design
 
-Voyara follows a clean and modular architecture.
+Voyara follows a clean and modular architecture:
 
 - User inputs flow through authentication and trip planning modules  
 - Timeline data is processed centrally  
 - Vega AI receives **read-only contextual data**  
 - All suggestions return to the UI for **explicit user approval**  
 
- Detailed **DFDs, Flowcharts, and Wireframes** are available inside `/docs` and `/assets`.
-
-
-##  Tech Stack: Hybrid & Scalable
-
-| Component | Technology | Purpose |
-|---------|-----------|---------|
-| **Frontend (Web)** | React + TypeScript | Interactive UI & timeline |
-| **Mobile Core** | Kotlin Multiplatform (KMP) | Shared business logic |
-| **Backend API** | Node.js + TypeScript | Auth, trip management |
-| **AI Service Layer** | FastAPI (Python) | Vega AI inference layer |
-| **AI Engine** | GenAI / LLMs | Context-aware suggestions |
-| **Database** | PostgreSQL | Relational data storage |
-| **Legacy Modules** | Java | Stability & integration |
-
-
-## Round-2 Enhancements (Completed)
-
-In Round-2, Voyara evolved into an **AI-assisted itinerary builder**.
-
-### Implemented Features
-- Vega AI assistant integration  
-- Context-aware suggestion engine  
-- Explainable AI responses  
-- Rule-based safety constraints  
-- Stateless & scalable AI architecture  
+Detailed **DFDs, Flowcharts, and Wireframes** are available inside [`/docs`](./docs/) and [`/assets`](./assets/).
 
 
 ## Future Scope
@@ -187,18 +272,13 @@ In Round-2, Voyara evolved into an **AI-assisted itinerary builder**.
 - Smart travel alerts & reminders  
 
 
-## Documentation & Compliance
-
-- Complete documentation is included in this repository  
-- DFDs, Flowcharts & Wireframes are provided  
-- AI is strictly assistive and non-autonomous  
-- All user actions require explicit confirmation  
-
-Voyara fully complies with hackathon guidelines.
-
+---
 
 <div align="center">
 
-*Crafted with innovation and a passion for travel by Team Voyara*
+*TEAM MEMBERS 
+**- SWATI** 
+**- PRAKHAR**
+**- LOVISH***
 
 </div>
